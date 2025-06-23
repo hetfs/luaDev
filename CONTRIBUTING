@@ -1,0 +1,215 @@
+# 🤝 Contributing to luaDev
+
+Thank you for your interest in contributing to **luaDev**!  
+We're building a modern, extensible Lua build system for serious developers using Lua, LuaJIT, C, Rust, and hybrid stacks.
+
+This guide will help you get started with contributing code, docs, templates, or ideas.
+
+---
+
+## 📦 Repository
+
+**Main Repo:** [`hetfs/luaDev`](https://github.com/hetfs/luaDev)
+
+---
+
+## 🧭 Project Goals
+
+- Modular and cross-platform build system for Lua & native code
+- Seamless CLI with test, format, doc, and plugin support
+- Smart configuration via Lua and `.envrc`
+- Developer-first: works out-of-the-box with optional automation
+
+---
+
+## 🛠️ Getting Started
+
+## 1. Fork and Clone
+
+```bash
+git clone https://github.com/your-username/luaDev.git
+cd luaDev
+```
+
+## 2. Install Prerequisites
+
+Use the platform-specific setup:
+
+- **macOS/Linux:**
+  
+  ```bash
+  ./scripts/setup-prereqs.sh
+  ```
+  
+- **Windows (PowerShell):**
+  
+  ```powershell
+  .\scripts\setup-prereqs.ps1
+  ```
+  
+
+---
+
+## 3. Bootstrap Dev Environment
+
+```bash
+./build.lua setup:bootstrap
+direnv allow .
+```
+
+---
+
+## 4. Run It
+
+```bash
+./build.lua help
+./build.lua build
+./build.lua test
+```
+
+---
+
+## 🧪 Development Tips
+
+- Use `luaDev-config.lua` for shared project config
+  
+- Use `.buildrc.lua` for personal overrides (auto-generated)
+  
+- Use `./build.lua config:docs` to update configuration documentation
+  
+- Format code with `./build.lua format` (uses `stylua`)
+  
+- Lint Lua with `luacheck` and static rules from `.luacheckrc`
+  
+
+---
+
+## 🧩 Contributing Plugins
+
+We welcome drop-in plugins that extend `luaDev` via the CLI:
+
+1. Create a new file in `luaDev/plugins/your-plugin.lua`
+  
+2. Add a handler function: `plugin_name:command(...)`
+  
+3. Register it in your `.buildrc.lua` or `luaDev-config.lua`
+  
+4. Document it in `docs/plugins.md`
+  
+
+Example:
+
+```lua
+-- plugins/hello.lua
+return {
+  ["hello"] = function(args)
+    print("Hello from luaDev plugin!")
+  end,
+}
+```
+
+---
+
+## 📝 Contributing Docs
+
+We use [Docusaurus](https://docusaurus.io/) for documentation.
+
+### Start local docs server:
+
+```bash
+npm install
+npm run start
+```
+
+### Update version notes:
+
+```bash
+./build.lua config:docs     # generate config keys
+git cliff --tag <version>  # update changelog
+```
+
+> `docs/what-new.md` is auto-synced on release.
+
+---
+
+## 💬 Commit Guidelines
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add new plugin loader
+fix: resolve path issue in rc:init
+docs: update plugin registry docs
+chore: bump version to v0.9.0
+```
+
+The project uses `commitlint` and optional `husky` hooks.
+
+---
+
+## ✅ Tests and Linting
+
+Run tests:
+
+```bash
+./build.lua test
+```
+
+Lint Lua:
+
+```bash
+luacheck .
+```
+
+Format Lua:
+
+```bash
+stylua .
+```
+
+---
+
+## 📦 Build and Package
+
+```bash
+./build.lua build
+./build.lua rock
+./build.lua package
+```
+
+---
+
+## 📂 Useful Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `scripts/setup-prereqs.sh` | Installs tools for Unix-like systems |
+| `scripts/setup-prereqs.ps1` | Installs tools on Windows via WinGet |
+| `scripts/dev-clean` | Resets the dev environment |
+| `.envrc` | `direnv` auto-load config |
+| `.luacheckrc` | Linting rules |
+| `stylua.toml` | Formatter config |
+
+---
+
+## 🙌 Ways to Contribute
+
+- Submit a plugin, formatter, or codegen tool
+  
+- Suggest new templates or profiles
+  
+- Improve docs or CLI help output
+  
+- Help test across platforms
+  
+- Report bugs or ideas in [issues](https://github.com/hetfs/luaDev/issues)
+  
+
+---
+
+## 💙 Thank You
+
+We're building `luaDev` to improve how Lua-native projects are developed and shipped.  
+Your help makes this project better for everyone. Let's make Lua development delightful again!
+
+The `luaDev` Team

@@ -1,0 +1,58 @@
+# stylua.toml — luaDev formatting rules
+# 🌐 https://github.com/hetfs/luaDev
+
+### 🎯 Core Formatting ###
+indent_type = "Spaces"
+indent_width = 2
+line_endings = "Unix"
+column_width = 100
+collapse_simple_statement = "Always"
+
+### 📜 Code Style Rules ###
+quote_style = "AutoPreferSingle"   # Single quotes unless interpolation needed
+call_parentheses = "Always"         # Always use parentheses in function calls
+align_args = true                   # Align function arguments vertically
+align_parameter = true              # Align function parameters
+indent_cond = "AlignWithThen"       # Align conditionals with 'then'
+trailing_comma = "Never"            # Never use trailing commas in tables
+sort_requires = true                # Alphabetize require statements
+
+### 🔍 File Discovery ###
+# Format all Lua files by default (override with CLI arguments)
+include = [
+  "**/*.lua",                     # All Lua files
+  "!**/vendor/**",                 # Exclude vendor code
+  "!**/generated/**"               # Exclude generated files
+]
+
+### 🚫 Permanent Exclusions ###
+exclude = [
+  # Dependency directories
+  "**/node_modules/**",            # Node.js modules
+  "**/.luarocks/**",               # LuaRocks installs
+  "**/dist/**",                    # Build outputs
+  "**/target/**",                  # Compilation artifacts
+  
+  # Version control
+  "**/.git/**",                    # Git metadata
+  "**/.svn/**",                    # SVN metadata
+  
+  # Special files
+  "**/legacy/**",                  # Legacy code
+  "**/archive/**",                 # Archived files
+  "stubs/**"                       # Type stubs
+]
+
+### ⚙️ Advanced Options ###
+[format]
+# Table formatting preferences
+table_separator = "Comma"          # Always use commas between table items
+table_extra_indent = false         # No extra indentation for tables
+
+# Function formatting
+fn_call_chain = "Auto"             # Smart multi-line function chaining
+fn_single_arg = "AlwaysParentheses" # foo(bar) instead of foo bar
+
+# Control structures
+no_break_after_do = true           # do\n  ...\nend vs do ... end
+space_around_infix_ops = true      # x + y instead of x+y
