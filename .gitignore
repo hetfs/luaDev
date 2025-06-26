@@ -36,6 +36,8 @@ scripts/logs/
 *.md.tmp
 *.manifest.json
 scripts/logs/manifest.json
+scripts/sources
+LuaBinaries
 
 #############################################
 # 🧪 Test & Coverage
