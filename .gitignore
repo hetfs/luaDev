@@ -1,20 +1,81 @@
-# Dependencies
-/node_modules
+#############################################
+# 🌐 Node.js & Docusaurus
+#############################################
+node_modules/
+.build/
+.docusaurus/
+.cache-loader/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Production
-/build
-
-# Generated files
-.docusaurus
-.cache-loader
-
-# Misc
-.DS_Store
+# Env overrides
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+#############################################
+# 🧱 Project Output & Artifacts
+#############################################
+luaBinary/
+**/build/
+**/dist/
+**/out/
+*.luac
+*.bak.lua
+
+#############################################
+# 📝 Logs & Generated Files
+#############################################
+scripts/logs/
+*.log
+*.bak
+*.tmp
+*.cache
+*.md.tmp
+*.manifest.json
+scripts/logs/manifest.json
+
+#############################################
+# 🧪 Test & Coverage
+#############################################
+coverage/
+*.lcov
+*.testlog
+
+#############################################
+# ⚙️ Configs & CLI Scripts
+#############################################
+.env
+.envrc
+.envrc.bat
+*.local
+license-init.*
+
+#############################################
+# 🧠 Editor / IDE
+#############################################
+.vscode/
+.idea/
+*.code-workspace
+
+#############################################
+# 🛠 PowerShell, Rust, Python, etc.
+#############################################
+*.ps1xml
+*.psd1
+*.psm1~
+.venv/
+venv/
+target/
+
+#############################################
+# 💻 OS & System Files
+#############################################
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+*.swp
+*.swo

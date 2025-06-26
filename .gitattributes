@@ -1,0 +1,23 @@
+# Source files (normalize line endings to LF)
+*.lua     text eol=lf
+*.ps1     text eol=lf
+*.psm1    text eol=lf
+*.sh      text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+
+# Treat logs and compiled binaries as binary
+*.log     binary
+*.luac    binary
+*.bak     binary
+*.tmp     binary
+*.cache   binary
+*.manifest.json binary
+
+# Mark changelogs as generated
+CHANGELOG.md linguist-generated=true
+what-new.md  linguist-generated=true
+
+# Ignore IDE metadata
+.vscode/* linguist-generated=true
+.idea/* linguist-generated=true

@@ -1,0 +1,43 @@
+# LuaDev-specific
+luaBinary/
+scripts/logs/
+scripts/modules/
+*.manifest.json
+*.testlog
+*.log
+*.bak
+*.tmp
+*.cache
+*.luac
+*.ps1xml
+*.psd1
+*.psm1~
+
+# Docusaurus build output
+build/
+.docusaurus/
+node_modules/
+.cache-loader
+coverage/
+*.lcov
+
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Env and system
+.env*
+.envrc*
+*.local
+
+# Editors/IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# OS-specific
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
