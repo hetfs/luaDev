@@ -1,8 +1,5 @@
 function Get-LuaSource {
-    param(
-        [Parameter(Mandatory)]
-        [string]$Version
-    )
+    param([Parameter(Mandatory)][string]$Version)
 
     $tarball = "lua-$Version.tar.gz"
     $url = "https://www.lua.org/ftp/$tarball"
@@ -35,17 +32,7 @@ function Get-LuaSource {
 
     # Extract archive
     try {
-        if ($IsWindows) {
-            & tar xzf $archivePath -C $sourcesDir
-        }
-        else {
-            & tar xzf $archivePath -C $sourcesDir
-        }
-
-        if (-not (Test-Path "$extractPath/src/lua.c")) {
-            throw "Source validation failed - lua.c missing"
-        }
-
+        & tar xzf $archivePath -C $sourcesDir
         return $extractPath
     }
     catch {

@@ -1,34 +1,35 @@
 <#
-    setup-prereqs.ps1 — LuaDev Windows Bootstrap Script
+    luaDev-prereqs.ps1 — LuaDev Windows Bootstrap Script
     https://github.com/hetfs/luaDev
 
     Author: Fredaws Lomdo
     Location: Accra, Ghana
+
     Description:
     - Installs Git, CMake, LLVM, Ninja, Python, Rust, Perl, direnv, git-cliff
-    - Supports CI mode with --ci flag
-    - Auto-updates packages with winget upgrade
-    - Cleans up old log files (keeps last 5 logs)
+    - Includes extra tools: Cppcheck, Clangd, LuaLS, 7-Zip, Make
+    - Supports flags: --ci, --Minimal, --All, --DryRun
+    - Cleans up old logs (keeps last 5)
+    - Verifies all tools after install
 #>
 
 param (
-    [switch]$ci
+    [switch]$ci,
+    [switch]$Minimal,
+    [switch]$All,
+    [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
 
-# Log directory setup with cleanup
+# Set log folder and rotate logs
 $logDir = "$PSScriptRoot\logs"
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-
-# Clean up old logs (keep last 5)
+$logFile = "$logDir\luaDev-prereqs-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
 Get-ChildItem -Path $logDir -Filter "luaDev-prereqs-*.log" |
     Sort-Object CreationTime -Descending |
     Select-Object -Skip 5 |
     Remove-Item -Force -ErrorAction SilentlyContinue
-
-# Create new log file
-$logFile = "$logDir\luaDev-prereqs-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
 
 function Write-Log {
     param (
@@ -38,7 +39,6 @@ function Write-Log {
     )
     $timestamp = "[$(Get-Date -Format u)]"
     $logMessage = "$timestamp $Message"
-    
     if ($NoNewLine) {
         Write-Host $Message -ForegroundColor $Color -NoNewline
     } else {
@@ -48,11 +48,10 @@ function Write-Log {
 }
 
 Write-Log "=== 🚀 luaDev Setup (Windows) ===" -Color Cyan
-Write-Log "🔧 Starting Lua Dev Setup" -Color DarkGray
 Write-Log "Log file: $logFile"
 Write-Log "CI Mode: $($ci.IsPresent)" -Color DarkGray
+Write-Log "Minimal: $($Minimal.IsPresent) | DryRun: $($DryRun.IsPresent)" -Color DarkGray
 
-# Winget validation
 function Assert-Winget {
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         Write-Log "❌ WinGet is not available" -Color Red
@@ -61,146 +60,140 @@ function Assert-Winget {
     }
 }
 
-# Enhanced installation function
 function Install-Tool {
     param (
         [string]$Command,
         [string]$WingetId,
-        [string]$DisplayName = $Command
+        [string]$Name = $Command
     )
 
-    # Check if already installed
     if (Get-Command $Command -ErrorAction SilentlyContinue) {
-        Write-Log "✅ $DisplayName already installed" -Color Green
+        Write-Log "✅ ${Name} already installed" -Color Green
         return $true
     }
 
-    Write-Log "⬇️ Installing $DisplayName ($WingetId)..." -Color Yellow
-    $installResult = winget install --id $WingetId --source winget `
-        --accept-package-agreements --accept-source-agreements `
-        --silent 2>&1
+    if ($DryRun) {
+        Write-Log "🔍 [DryRun] Would install: ${Name} ($WingetId)" -Color Yellow
+        return $true
+    }
+
+    Write-Log "⬇️ Installing ${Name} ($WingetId)..." -Color Yellow
+    $installResult = winget install --id=$WingetId -e --accept-package-agreements --accept-source-agreements 2>&1
 
     if ($LASTEXITCODE -eq 0) {
-        Write-Log "✅ $DisplayName installed successfully" -Color Green
+        Write-Log "✅ ${Name} installed successfully" -Color Green
         return $true
     }
-    
-    Write-Log "❌ $DisplayName installation failed (Code: $LASTEXITCODE)" -Color Red
+
+    Write-Log "❌ ${Name} installation failed (Code: $LASTEXITCODE)" -Color Red
     Write-Log "Error details: $installResult" -Color Red
     return $false
 }
 
-# Environment refresh function
 function Update-Environment {
     Write-Log "🔄 Refreshing environment variables..." -Color DarkGray
-    foreach ($level in "Machine", "User") {
-        [Environment]::GetEnvironmentVariables($level).GetEnumerator() | ForEach-Object {
-            if ($_.Name -eq 'PATH') {
-                $_.Value = [Environment]::GetEnvironmentVariable($_.Name, $level)
-            } else {
-                Set-Item "env:$($_.Name)" $_.Value
-            }
-        }
-    }
-    $env:PATH = [Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" +
-                [Environment]::GetEnvironmentVariable("PATH", "User") + ";" +
-                [Environment]::GetEnvironmentVariable("PATH", "Process")
+    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" +
+                [System.Environment]::GetEnvironmentVariable("PATH","User") + ";" +
+                [System.Environment]::GetEnvironmentVariable("PATH","Process")
 }
 
-# ------------------------- Main Execution -------------------------
-Assert-Winget
-
-# Auto-upgrade packages
-if ($ci) {
-    Write-Log "🔄 Upgrading installed packages..." -Color DarkYellow
-    winget upgrade --all --silent --accept-package-agreements --accept-source-agreements
-    if ($LASTEXITCODE -ne 0) {
-        Write-Log "⚠️ Package upgrades completed with errors" -Color Yellow
-    }
-}
-
-# Install tools
-Write-Log "`n=== 🔧 Installing Tools ===" -Color Cyan
-$tools = @(
+# Define tool groups
+$coreTools = @(
     @{Command = "git"; WingetId = "Git.Git"; Name = "Git"},
     @{Command = "cmake"; WingetId = "Kitware.CMake"; Name = "CMake"},
     @{Command = "clang"; WingetId = "LLVM.LLVM"; Name = "LLVM/Clang"},
-    @{Command = "ninja"; WingetId = "Microsoft.Ninja"; Name = "Ninja"},
-    @{Command = "python"; WingetId = "Python.Python.3"; Name = "Python 3"},
+    @{Command = "clangd"; WingetId = "LLVM.clangd"; Name = "Clangd"},
+    @{Command = "ninja"; WingetId = "Ninja-build.Ninja"; Name = "Ninja"},
+    @{Command = "python"; WingetId = "Python.Python.3.13"; Name = "Python"},
     @{Command = "rustc"; WingetId = "Rustlang.Rustup"; Name = "Rust Toolchain"},
     @{Command = "perl"; WingetId = "StrawberryPerl.StrawberryPerl"; Name = "Perl"},
     @{Command = "direnv"; WingetId = "direnv.direnv"; Name = "direnv"},
     @{Command = "git-cliff"; WingetId = "Orhun.git-cliff"; Name = "git-cliff"}
 )
 
+$extraTools = @(
+    @{Command = "cppcheck"; WingetId = "Cppcheck.Cppcheck"; Name = "Cppcheck"},
+    @{Command = "make"; WingetId = "GnuWin32.Make"; Name = "GNU Make"},
+    @{Command = "7z"; WingetId = "7zip.7zip"; Name = "7-Zip"},
+    @{Command = "lua-language-server"; WingetId = "LuaLS.lua-language-server"; Name = "LuaLS"}
+)
+
+$toolsToInstall = if ($All) {
+    $coreTools + $extraTools
+} elseif ($Minimal) {
+    $coreTools | Where-Object { $_.Name -in @("Git", "CMake", "Python", "Rust Toolchain") }
+} else {
+    $coreTools
+}
+
+# Start installs
+Assert-Winget
+Write-Log "`n=== 🔧 Installing Tools ===" -Color Cyan
+
 $allSuccess = $true
-foreach ($tool in $tools) {
+foreach ($tool in $toolsToInstall) {
     if (-not (Install-Tool @tool)) {
         $allSuccess = $false
         if ($ci) { exit 1 }
     }
 }
 
-# Setup Rust
-if (Get-Command rustup -ErrorAction SilentlyContinue) {
-    Write-Log "🦀 Configuring Rust toolchain..." -Color DarkGray
-    rustup install stable 2>&1 | Out-File $logFile -Append
-    rustup default stable 2>&1 | Out-File $logFile -Append
+# Rust setup
+if ((Get-Command rustup -ErrorAction SilentlyContinue) -and -not $DryRun) {
+    Write-Log "🦀 Configuring Rust toolchain..." -Color Gray
+    rustup install stable | Out-File $logFile -Append
+    rustup default stable | Out-File $logFile -Append
 }
 
-# Add Cargo to PATH
-$cargoPath = "$env:USERPROFILE\.cargo\bin"
-if (-not ($env:Path -split ';' -contains $cargoPath)) {
-    [Environment]::SetEnvironmentVariable("Path", "$env:Path;$cargoPath", "User")
-    $env:Path += ";$cargoPath"
-    Write-Log "🔧 Added Cargo to PATH" -Color Cyan
-}
-
-# Refresh environment after installations
 Update-Environment
 
-# Verification
+# Tool Verification
 Write-Log "`n=== 🔍 Verifying Tools ===" -Color Cyan
-$toolsToVerify = @(
-    @{Name = "Git"; Command = "git"; Arguments = "--version"},
-    @{Name = "CMake"; Command = "cmake"; Arguments = "--version"},
-    @{Name = "Clang"; Command = "clang"; Arguments = "--version"},
-    @{Name = "Ninja"; Command = "ninja"; Arguments = "--version"},
-    @{Name = "Python"; Command = "python"; Arguments = "--version"},
-    @{Name = "Rust"; Command = "rustc"; Arguments = "--version"},
-    @{Name = "Cargo"; Command = "cargo"; Arguments = "--version"},
-    @{Name = "Perl"; Command = "perl"; Arguments = "-v"},  # Standard version output
-    @{Name = "direnv"; Command = "direnv"; Arguments = "--version"},
-    @{Name = "git-cliff"; Command = "git-cliff"; Arguments = "--version"}
-)
+$verifyTools = $toolsToInstall | ForEach-Object {
+    $cmd = $_.Command
+    $args = "--version"
+    if ($cmd -eq "perl") { $args = "-v" }
+    if ($cmd -eq "lua-language-server") { $args = "--version" }
+    if ($cmd -eq "7z") { $cmd = "7z"; $args = "" }
+    @{ Name = $_.Name; Command = $cmd; Arguments = $args }
+}
 
-foreach ($tool in $toolsToVerify) {
+foreach ($tool in $verifyTools) {
+    $Name = $tool.Name
+    $Command = $tool.Command
+    $Arguments = $tool.Arguments
+
     try {
-        $output = & $tool.Command $tool.Arguments 2>&1 | Select-Object -First 1
-        
-        # For Perl's -v output, clean up the first line
-        if ($tool.Name -eq "Perl") {
-            $output = ($output -split "`n")[0]  # Get first line of multi-line output
+        if (-not (Get-Command $Command -ErrorAction SilentlyContinue)) {
+            Write-Log "❌ ${Name}: Command not found" -Color Red
+            $allSuccess = $false
+            continue
         }
-        
-        Write-Log "✅ $($tool.Name): $($output.Trim())" -Color Green
+
+        $output = & $Command $Arguments 2>&1 | Select-Object -First 1
+        if ($Name -eq "Perl") {
+            $output = ($output -split "`n")[0]
+        }
+
+        Write-Log "✅ ${Name}: $($output.Trim())" -Color Green
     } catch {
-        Write-Log "❌ $($tool.Name): Verification failed" -Color Red
+        Write-Log "❌ ${Name}: Verification failed" -Color Red
         $allSuccess = $false
     }
 }
 
-# Final status
-if ($allSuccess) {
+# Final Summary
+if ($DryRun) {
+    Write-Log "`n[DryRun] Completed preview mode. No changes made." -Color Cyan
+} elseif ($allSuccess) {
     Write-Log "`n=== ✅ Setup Completed Successfully! ===" -Color Green
 } else {
-    Write-Log "`n=== ⚠️ Setup Completed With Warnings ===" -Color Yellow
-    Write-Log "Check log file for details: $logFile" -Color Yellow
+    Write-Log "`n=== ⚠️ Setup Completed With Issues ===" -Color Yellow
+    Write-Log "Review the log file: $logFile" -Color Yellow
 }
 
-# Log cleanup report
-$keptLogs = Get-ChildItem -Path $logDir -Filter "luaDev-prereqs-*.log" | 
+$keptLogs = Get-ChildItem -Path $logDir -Filter "luaDev-prereqs-*.log" |
     Sort-Object CreationTime -Descending |
     Select-Object -First 5
 
-Write-Log "`n🗑️ Log cleanup: Kept ${$keptLogs.Count} most recent logs" -Color DarkGray
+Write-Log "`n🗑️ Log cleanup complete — Kept $($keptLogs.Count) logs in $logDir" -Color DarkGray

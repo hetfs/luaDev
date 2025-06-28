@@ -1,51 +1,75 @@
 function Build-LuaVersion {
     param(
-        [Parameter(Mandatory)]
-        [string]$Version,
-        [Parameter(Mandatory)]
-        [string]$SourcePath
+        [Parameter(Mandatory)][string]$Version,
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$BuildType,
+        [Parameter(Mandatory)][string]$Compiler
     )
 
-    $osInfo = Get-OSPlatform
-    $artifactPath = Get-ArtifactPath -Engine "lua" -Version $Version -Create
+    $artifactPath = Get-ArtifactPath -Engine "lua" -Version $Version -BuildType $BuildType -Compiler $Compiler -Create
     Push-Location $SourcePath
 
     try {
-        Write-InfoLog "🏗️ Building Lua $Version for $($osInfo.Platform)"
+        # Create build directory
+        $buildDir = Join-Path $SourcePath "build"
+        New-Item $buildDir -ItemType Directory -Force | Out-Null
 
-        # Clean Makefile to remove AIX/FreeBSD duplicates
-        $makefilePath = Join-Path $SourcePath "Makefile"
-        if (Test-Path $makefilePath) {
-            $content = Get-Content $makefilePath -Raw
-            $content = $content -replace '(?m)^AIX:.*\r?\n', ''
-            $content = $content -replace '(?m)^FreeBSD:.*\r?\n', ''
-            $content | Set-Content $makefilePath -Force
-        }
+        # Configure build parameters
+        $cmakeParams = @(
+            "-S", $SourcePath,
+            "-B", $buildDir,
+            "-DCMAKE_BUILD_TYPE=Release"
+        )
 
-        # Platform-specific build
-        switch ($osInfo.Platform) {
-            "windows" { Build-LuaWindows -Version $Version }
-            default   { Build-LuaUnix -Cores $osInfo.Cores }
-        }
-
-        # Copy binaries
-        if ($osInfo.Platform -eq "windows") {
-            $binDir = if ($Version.StartsWith("5.1")) { "." } else { "src" }
-            $binaries = "lua.exe", "luac.exe"
+        # Build type configuration
+        if ($BuildType -eq "shared") {
+            $cmakeParams += "-DBUILD_SHARED_LIBS=ON"
         }
         else {
-            $binDir = "src"
-            $binaries = "lua", "luac"
+            $cmakeParams += "-DBUILD_SHARED_LIBS=OFF"
         }
 
-        $binaries | ForEach-Object {
-            $sourceFile = Join-Path $binDir $_
-            if (-not (Test-Path $sourceFile)) {
-                throw "Binary not found: $sourceFile"
+        # Compiler-specific configuration
+        switch ($Compiler) {
+            "mingw" {
+                $cmakeParams += "-G", "MinGW Makefiles"
             }
-            Copy-Item $sourceFile $artifactPath -Force -ErrorAction Stop
+            "clang" {
+                $cmakeParams += "-G", "Ninja"
+                $cmakeParams += "-DCMAKE_C_COMPILER=clang"
+                $cmakeParams += "-DCMAKE_CXX_COMPILER=clang++"
+            }
+            "msvc" {
+                $cmakeParams += "-A", "x64"
+            }
         }
 
+        # Run CMake configuration
+        Write-InfoLog "🛠️ Configuring build (Type: $BuildType, Compiler: $Compiler)"
+        & cmake @cmakeParams
+        if ($LASTEXITCODE -ne 0) { throw "CMake configuration failed" }
+
+        # Build with CMake
+        $buildParams = @("--build", $buildDir, "--config", "Release")
+        if ((Get-OSPlatform).Cores -gt 1) {
+            $buildParams += "--", "/maxcpucount"
+        }
+
+        Write-InfoLog "🏗️ Building binaries..."
+        & cmake @buildParams
+        if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+
+        # Copy artifacts
+        $binDir = if ($Compiler -eq "msvc") {
+            Join-Path $buildDir "Release"
+        } else {
+            $buildDir
+        }
+
+        $binaries = Get-ChildItem $binDir -Include *.exe, *.dll, *.lib
+        $binaries | Copy-Item -Destination $artifactPath -Force
+
+        Write-InfoLog "📦 Artifacts copied to: $artifactPath"
         return $true
     }
     catch {
@@ -54,34 +78,6 @@ function Build-LuaVersion {
     }
     finally {
         Pop-Location
-    }
-}
-
-function Build-LuaWindows {
-    param([string]$Version)
-
-    if ($Version.StartsWith("5.1")) {
-        & mingw32-make PLAT=mingw TO_BIN="lua51.exe luac51.exe" lua51.exe luac51.exe
-        Rename-Item "lua51.exe" "lua.exe" -ErrorAction SilentlyContinue
-        Rename-Item "luac51.exe" "luac.exe" -ErrorAction SilentlyContinue
-    }
-    else {
-        & mingw32-make PLAT=mingw CC=gcc
-    }
-}
-
-function Build-LuaUnix {
-    param([int]$Cores = 4)
-
-    $env:PLAT = if ($IsMacOS) { "macosx" } else { "linux" }
-
-    $makeCmd = if (Get-Command gmake -ErrorAction SilentlyContinue) { "gmake" } else { "make" }
-
-    if ($Cores -gt 1) {
-        & $makeCmd -j $Cores $env:PLAT
-    }
-    else {
-        & $makeCmd $env:PLAT
     }
 }
 

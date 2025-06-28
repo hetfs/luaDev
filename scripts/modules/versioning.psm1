@@ -6,7 +6,8 @@ function Get-LatestLuaVersions {
         $versions = [regex]::Matches($response.Content, 'lua-(\d+\.\d+\.\d+)\.tar\.gz') |
             ForEach-Object { $_.Groups[1].Value } |
             Where-Object { $_ -match "5\.(1|2|3|4)" } |
-            Sort-Object { [System.Version]$_ } -Descending
+            Sort-Object { [System.Version]$_ } -Descending |
+            Select-Object -First 4
 
         return $versions
     }

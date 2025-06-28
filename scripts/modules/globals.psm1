@@ -1,5 +1,4 @@
 function Get-ProjectRoot {
-    # Project root is parent of scripts directory
     return Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 }
 
@@ -10,11 +9,15 @@ function Get-ArtifactPath {
         $Engine,
         [Parameter(Mandatory)]
         [string]$Version,
+        [Parameter(Mandatory)]
+        [string]$BuildType,
+        [Parameter(Mandatory)]
+        [string]$Compiler,
         [switch]$Create
     )
 
     $osInfo = Get-OSPlatform
-    $path = Join-Path (Join-Path (Get-ProjectRoot) "LuaBinaries") "${Engine}-${Version}-$($osInfo.Platform)-$($osInfo.Architecture)"
+    $path = Join-Path (Get-ProjectRoot) "binaries" "${Engine}-${Version}-${BuildType}-${Compiler}-$($osInfo.Architecture)"
 
     if ($Create -and -not (Test-Path $path)) {
         New-Item $path -ItemType Directory -Force | Out-Null
@@ -23,8 +26,7 @@ function Get-ArtifactPath {
 }
 
 function Get-SourcesRoot {
-    $scriptsDir = Split-Path $PSScriptRoot -Parent
-    $path = Join-Path $scriptsDir "sources"
+    $path = Join-Path (Get-ProjectRoot) "sources"
     if (-not (Test-Path $path)) {
         New-Item $path -ItemType Directory -Force | Out-Null
     }
@@ -40,8 +42,7 @@ function Get-ManifestsRoot {
 }
 
 function Get-ScriptsLogsRoot {
-    $scriptsDir = Split-Path $PSScriptRoot -Parent
-    $path = Join-Path $scriptsDir "logs"
+    $path = Join-Path (Get-ProjectRoot) "logs"
     if (-not (Test-Path $path)) {
         New-Item $path -ItemType Directory -Force | Out-Null
     }

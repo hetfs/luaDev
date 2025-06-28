@@ -42,12 +42,5 @@ function Write-VerboseLog {
     }
 }
 
-function Write-DebugLog {
-    param([string]$Message)
-    if ($script:CurrentLogLevel -ge $script:LogLevels["Debug"]) {
-        Write-Host $Message -ForegroundColor DarkGray
-    }
-}
-
-Export-ModuleMember -Function Set-LogLevel, Write-InfoLog, Write-ErrorLog,
-    Write-WarningLog, Write-VerboseLog, Write-DebugLog
+Export-ModuleMember -Function Set-LogLevel, Write-InfoLog,
+    Write-ErrorLog, Write-WarningLog, Write-VerboseLog

@@ -1,33 +1,32 @@
 <#
 .SYNOPSIS
-    Automated Lua/LuaJIT build system
+    Automated Lua/LuaJIT build system for Windows
 .DESCRIPTION
-    Builds Lua (5.1-5.4) and LuaJIT binaries
+    Builds Lua (5.1-5.4) and LuaJIT binaries for Windows
 .PARAMETER Versions
-    Target versions (shorthand or full) e.g., "514" or "5.1.4"
-    Aliases: V
+    Target Lua versions (shorthand or full) e.g., "514" or "5.1.4"
 .PARAMETER Engines
     Build targets: "lua", "luajit", or both
-    Aliases: E
+.PARAMETER BuildType
+    Build configuration: "static" or "shared"
+.PARAMETER Compiler
+    Compiler toolchain: "msvc", "mingw", or "clang"
 .PARAMETER LogLevel
     Output verbosity: Silent, Error, Warn, Info, Verbose, Debug
-    Aliases: LL
 .EXAMPLE
-    # Build all Lua versions
-    .\buildLua.ps1
-.EXAMPLE
-    # Build specific version (shorthand)
-    .\buildLua.ps1 -V 514
+    # Build Lua 5.4.8 and LuaJIT with Clang
+    .\buildLua.ps1 -Versions 548 -Engines lua,luajit -Compiler clang
 #>
 
 [CmdletBinding()]
 param (
-    [Alias("V")]
     [string[]]$Versions = @(),
-    [Alias("E")]
     [ValidateSet("lua", "luajit")]
     [string[]]$Engines = @("lua"),
-    [Alias("LL")]
+    [ValidateSet("static", "shared")]
+    [string]$BuildType = "static",
+    [ValidateSet("msvc", "mingw", "clang")]
+    [string]$Compiler = "clang",
     [ValidateSet("Silent", "Error", "Warn", "Info", "Verbose", "Debug")]
     [string]$LogLevel = "Info"
 )
@@ -43,7 +42,8 @@ Get-ChildItem $ModulesPath -Filter *.psm1 | ForEach-Object {
 
 # Configure diagnostics
 Set-LogLevel -Level $LogLevel
-Write-InfoLog "🚀 Starting Lua/LuaJIT build automation"
+Write-InfoLog "🚀 Starting Lua/LuaJIT build automation (Windows)"
+Write-InfoLog "🔧 Configuration: BuildType=$BuildType, Compiler=$Compiler"
 
 # Create logs directory
 $logsRoot = Get-ScriptsLogsRoot
@@ -53,15 +53,16 @@ Start-Transcript -Path $logPath -Append | Out-Null
 
 #region Environment Setup
 # Verify required tools
-$requiredTools = @("make", "tar")
-if ($IsWindows) { $requiredTools += "gcc" }
-if ($Engines -contains "luajit") { $requiredTools += "git" }
+$requiredTools = @("git", "cmake")
+switch ($Compiler) {
+    "mingw" { $requiredTools += "gcc" }
+    "clang" { $requiredTools += "clang" }
+    "msvc" { $requiredTools += "msbuild" }
+}
 
 $toolStatus = Confirm-ToolAvailability -Tools $requiredTools
 if (-not $toolStatus.Available) {
     Write-ErrorLog "❌ Missing build tools: $($toolStatus.Missing -join ', ')"
-    Write-InfoLog "💡 Installation instructions:"
-    $toolStatus.Suggestions | ForEach-Object { Write-InfoLog "  $_" }
     exit 1
 }
 
@@ -74,9 +75,9 @@ Get-ManifestsRoot | Out-Null
 $Engines = $Engines | ForEach-Object { $_.Trim().ToLower() } | Select-Object -Unique
 Write-InfoLog "🔧 Build targets: $($Engines -join ', ')"
 
-if (-not $Versions) {
+if ($Engines -contains "lua" -and -not $Versions) {
     $Versions = Get-LatestLuaVersions
-    Write-InfoLog "🔍 Auto-detected versions: $($Versions -join ', ')"
+    Write-InfoLog "🔍 Auto-detected Lua versions: $($Versions -join ', ')"
 }
 
 $BuildTargets = [System.Collections.Generic.List[string]]::new()
@@ -108,6 +109,8 @@ if ($Engines -contains "lua") {
         $artifact = @{
             Engine = "lua"
             Version = $version
+            BuildType = $BuildType
+            Compiler = $Compiler
             Platform = $osInfo.Platform
             Architecture = $osInfo.Architecture
             BuildTime = [DateTime]::UtcNow
@@ -115,12 +118,12 @@ if ($Engines -contains "lua") {
         }
 
         try {
-            Write-InfoLog "📦 Building Lua $version"
+            Write-InfoLog "📦 Building Lua $version ($BuildType) with $Compiler"
             $srcDir = Get-LuaSource -Version $version
             if (-not $srcDir) {
                 throw "Source download failed"
             }
-            $buildResult = Build-LuaVersion -Version $version -SourcePath $srcDir
+            $buildResult = Build-LuaVersion -Version $version -SourcePath $srcDir -BuildType $BuildType -Compiler $Compiler
 
             if ($buildResult) {
                 $artifact.Success = $true
@@ -140,6 +143,8 @@ if ($Engines -contains "luajit") {
     $artifact = @{
         Engine = "luajit"
         Version = "unknown"
+        BuildType = $BuildType
+        Compiler = $Compiler
         Platform = $osInfo.Platform
         Architecture = $osInfo.Architecture
         BuildTime = [DateTime]::UtcNow
@@ -147,8 +152,8 @@ if ($Engines -contains "luajit") {
     }
 
     try {
-        Write-InfoLog "⚡ Building LuaJIT"
-        $jitVersion = Build-LuaJIT
+        Write-InfoLog "⚡ Building LuaJIT ($BuildType) with $Compiler"
+        $jitVersion = Build-LuaJIT -BuildType $BuildType -Compiler $Compiler
 
         if ($jitVersion) {
             $artifact.Version = $jitVersion
@@ -177,7 +182,7 @@ if ($successCount -gt 0) {
     Write-InfoLog "🏁 Completed in ${duration}m | Success: $successCount/$($Artifacts.Count)"
     $Artifacts | ForEach-Object {
         $status = if ($_.Success) { "✅" } else { "❌" }
-        Write-Host "  $status [$($_.Engine)] $($_.Version)" -ForegroundColor $(if($_.Success){"Green"}else{"Red"})
+        Write-Host "  $status [$($_.Engine)] $($_.Version) ($($_.BuildType)/$($_.Compiler))" -ForegroundColor $(if($_.Success){"Green"}else{"Red"})
     }
     exit 0
 }
