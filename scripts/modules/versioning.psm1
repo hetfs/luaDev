@@ -1,3 +1,6 @@
+# versioning.psm1
+# 🔢 Version parsing, latest detection, and support validation
+
 $script:SupportedVersions = @("5.4", "5.3", "5.2", "5.1")
 
 function Get-LatestLuaVersions {

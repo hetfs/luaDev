@@ -1,27 +1,30 @@
 function Get-LuaSource {
-    param([Parameter(Mandatory)][string]$Version)
+    param(
+        [Parameter(Mandatory)][string]$Version
+    )
 
-    $tarball = "lua-$Version.tar.gz"
-    $url = "https://www.lua.org/ftp/$tarball"
-    $sourcesDir = Get-SourcesRoot
-    $archivePath = Join-Path $sourcesDir $tarball
-    $extractPath = Join-Path $sourcesDir "lua-$Version"
+    $sourcesRoot   = Get-SourcesRoot
+    $tarball       = "lua-$Version.tar.gz"
+    $archivePath   = Join-Path $sourcesRoot $tarball
+    $extractPath   = Join-Path $sourcesRoot "lua-$Version"
+    $sourceLuaPath = Join-Path $extractPath "src/lua.c"
+    $cmakePath     = Join-Path $extractPath "CMakeLists.txt"
 
-    # Check existing source
-    if (Test-Path "$extractPath/src/lua.c") {
+    # ♻️ Reuse already-extracted source
+    if (Test-Path $sourceLuaPath) {
         Write-InfoLog "♻️ Using cached Lua $Version source"
         return $extractPath
     }
 
-    # Download with retries
+    # 🌍 Download from Lua.org
+    $url = "https://www.lua.org/ftp/$tarball"
     $maxRetries = 3
     for ($i = 1; $i -le $maxRetries; $i++) {
         try {
             Write-InfoLog "⬇️ Downloading Lua $Version (attempt $i/$maxRetries)"
             Invoke-WebRequest $url -OutFile $archivePath -UseBasicParsing -ErrorAction Stop
             break
-        }
-        catch {
+        } catch {
             if ($i -eq $maxRetries) {
                 Write-ErrorLog "❌ Download failed: $($_.Exception.Message)"
                 return $null
@@ -30,15 +33,29 @@ function Get-LuaSource {
         }
     }
 
-    # Extract archive
+    # 📦 Extract
     try {
-        & tar xzf $archivePath -C $sourcesDir
-        return $extractPath
-    }
-    catch {
+        & tar xzf $archivePath -C $sourcesRoot
+        if (-not (Test-Path $sourceLuaPath)) {
+            throw "Extraction incomplete — lua.c not found"
+        }
+    } catch {
         Write-ErrorLog "❌ Extraction failed: $($_.Exception.Message)"
         return $null
     }
+
+    # 🧩 Inject fallback CMakeLists.txt if missing
+    if (-not (Test-Path $cmakePath)) {
+        $template = Join-Path $PSScriptRoot "..\templates\CMakeLists.lua.txt"
+        if (Test-Path $template) {
+            Copy-Item -Path $template -Destination $cmakePath -Force
+            Write-InfoLog "🧩 Injected fallback CMakeLists.txt"
+        } else {
+            Write-WarningLog "⚠️ No template found: CMakeLists.lua.txt"
+        }
+    }
+
+    return $extractPath
 }
 
 Export-ModuleMember -Function Get-LuaSource

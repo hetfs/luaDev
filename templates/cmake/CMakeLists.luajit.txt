@@ -1,0 +1,19 @@
+# LuaJIT specific configurations
+if(WIN32)
+    target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
+endif()
+
+set_target_properties(lua PROPERTIES
+    VERSION ${LUA_VERSION}
+    SOVERSION ${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR}
+)
+
+# Additional sources and GC64 flag
+list(APPEND LUA_SOURCES
+    "src/lj_*.c"
+    "src/lj_*.h"
+    "src/ljamalg.c"
+)
+
+# GC64 mode flag
+target_compile_definitions(lua PRIVATE @GC64_FLAG@)

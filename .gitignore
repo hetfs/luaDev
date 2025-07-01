@@ -81,3 +81,4 @@ ehthumbs.db
 desktop.ini
 *.swp
 *.swo
+/logs/

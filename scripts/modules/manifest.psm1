@@ -1,54 +1,76 @@
 function Export-LuaBuildManifest {
     param([array]$Artifacts)
 
-    $jsonPath = Join-Path (Get-ManifestsRoot) "manifest.json"
-    $timestamp = [DateTime]::UtcNow.ToString("o")
+    function Get-OSPlatform {
+        return @{
+            Platform     = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription.Trim()
+            Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+        }
+    }
+
+    function Get-ManifestsRoot {
+        $root = Join-Path $PSScriptRoot "..\..\manifests"
+        if (-not (Test-Path $root)) {
+            New-Item -ItemType Directory -Path $root -Force | Out-Null
+        }
+        return $root
+    }
+
+    $manifestsRoot = Get-ManifestsRoot
+    $jsonPath = Join-Path $manifestsRoot "manifest.json"
+    $mdPath   = Join-Path $manifestsRoot "manifest.md"
+    $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
     $osInfo = Get-OSPlatform
 
-    # JSON Manifest with increased depth
+    # 🧱 Build structured JSON
     $manifest = @{
         Timestamp = $timestamp
         System = @{
-            Platform = $osInfo.Platform
+            Platform     = $osInfo.Platform
             Architecture = $osInfo.Architecture
         }
         Artifacts = $Artifacts | ForEach-Object {
             @{
-                Engine = $_.Engine
-                Version = $_.Version
-                BuildType = $_.BuildType
-                Compiler = $_.Compiler
-                Success = $_.Success
-                Path = Join-Path "binaries" "$($_.Engine)-$($_.Version)-$($_.BuildType)-$($_.Compiler)-$($osInfo.Architecture)"
+                Engine      = $_.Engine
+                Version     = $_.Version
+                BuildType   = $_.BuildType
+                Compiler    = $_.Compiler
+                Success     = $_.Success
+                Path        = Join-Path "binaries" "$($_.Engine)-$($_.Version)-$($_.BuildType)-$($_.Compiler)-$($osInfo.Architecture)"
             }
         }
     }
 
-    # Increased depth to 10 to prevent truncation
-    $manifest | ConvertTo-Json -Depth 10 | Set-Content $jsonPath
+    # 💾 Save JSON
+    $manifest | ConvertTo-Json -Depth 10 | Set-Content -Path $jsonPath -Encoding UTF8
+    Write-Host "📄 JSON manifest exported: $jsonPath"
 
-    # Markdown Report
-    $mdPath = Join-Path (Get-ManifestsRoot) "manifest.md"
-    $mdContent = @"
-# Lua Build Manifest
+    # 📝 Markdown table
+    $successCount = ($Artifacts | Where-Object { $_.Success }).Count
+    $totalCount   = $Artifacts.Count
 
-## Summary
-- **Timestamp**: $timestamp
-- **System**: $($osInfo.Platform)-$($osInfo.Architecture)
-- **Success Rate**: $($Artifacts.Where({$_.Success}).Count)/$($Artifacts.Count) succeeded
+    $mdHeader = @"
+# 📦 Lua Build Manifest
 
-## Artifacts
-| Engine  | Version   | Build Type | Compiler | Status   | Binary Path |
-|---------|-----------|------------|----------|----------|-------------|
+**Generated:** $timestamp
+**System:** $($osInfo.Platform) / $($osInfo.Architecture)
+**Success Rate:** $successCount / $totalCount builds succeeded
+
+## 🔍 Artifacts
+
+| Engine  | Version | Build Type | Compiler | Status     | Binary Path |
+|---------|---------|------------|----------|------------|-------------|
 "@
 
-    $Artifacts | ForEach-Object {
+    $mdRows = $Artifacts | ForEach-Object {
         $status = if ($_.Success) { "✅ Success" } else { "❌ Failed" }
-        $binaryPath = "$($_.Engine)-$($_.Version)-$($_.BuildType)-$($_.Compiler)-$($osInfo.Architecture)"
-        $mdContent += "| $($_.Engine) | $($_.Version) | $($_.BuildType) | $($_.Compiler) | $status | \`$binaries/$binaryPath |`n"
+        $binPath = "binaries/$($_.Engine)-$($_.Version)-$($_.BuildType)-$($_.Compiler)-$($osInfo.Architecture)"
+        "| $($_.Engine) | $($_.Version) | $($_.BuildType) | $($_.Compiler) | $status | $binPath |"
     }
 
-    $mdContent | Set-Content $mdPath
+    $mdContent = $mdHeader + ($mdRows -join "`n") + "`n"
+    $mdContent | Set-Content -Path $mdPath -Encoding UTF8
+    Write-Host "📝 Markdown manifest exported: $mdPath"
 }
 
 Export-ModuleMember -Function Export-LuaBuildManifest

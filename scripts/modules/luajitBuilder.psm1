@@ -1,129 +1,119 @@
+# luajitBuilder.psm1
+# ⚡ Build LuaJIT 2.1 with CMake-based system and compiler selection
+
 function Build-LuaJIT {
-    param(
-        [Parameter(Mandatory)][string]$BuildType,
-        [Parameter(Mandatory)][string]$Compiler
+    param (
+        [Parameter(Mandatory)][string]$Version,
+        [Parameter(Mandatory)][string]$SourcePath,
+        [ValidateSet("static", "shared")][string]$BuildType = "static",
+        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang"
     )
 
-    $sourcePath = Join-Path (Get-SourcesRoot) "LuaJIT"
-    $buildMode = if ($BuildType -eq "shared") { "dynamic" } else { "static" }
+    Write-VerboseLog "🔧 Starting LuaJIT $Version build with $Compiler ($BuildType)"
 
     try {
-        # Clone or update repository
-        if (-not (Test-Path (Join-Path $sourcePath ".git"))) {
-            Write-InfoLog "🌐 Cloning LuaJIT repository (v2.1 branch)"
-            & git clone --branch v2.1 --single-branch --depth 1 https://github.com/LuaJIT/LuaJIT.git $sourcePath
+        # === 1. Generate CMakeLists.txt from templates ===
+        $cmakeFile = Join-Path $SourcePath "CMakeLists.txt"
+        $templateDir = Join-Path $PSScriptRoot "..\..\templates\cmake"
+
+        # Get base and engine-specific templates
+        $defaultTemplate = Join-Path $templateDir "CMakeLists.lua.default.txt"
+        $engineTemplate = Join-Path $templateDir "CMakeLists.luajit.txt"
+
+        $content = Get-Content $defaultTemplate -Raw
+        $engineContent = Get-Content $engineTemplate -Raw
+
+        # Combine templates
+        $content = $content -replace '@VERSION_SPECIFIC@', $engineContent
+
+        # Set build parameters
+        $libraryType = if ($BuildType -eq "shared") { "SHARED" } else { "STATIC" }
+        $sharedFlag = if ($BuildType -eq "shared") { "ON" } else { "OFF" }
+
+        $content = $content -replace '@LIBRARY_TYPE@', $libraryType
+        $content = $content -replace '@SHARED_FLAG@', $sharedFlag
+        $content = $content -replace '\$\{LUA_VERSION\}', $Version
+
+        # Handle LuaJIT version parts
+        $versionParts = $Version -split '\.'
+        $content = $content -replace '\$\{LUA_VERSION_MAJOR\}', $versionParts[0]
+        $content = $content -replace '\$\{LUA_VERSION_MINOR\}', $versionParts[1]
+
+        # Apply GC64 flag (LuaJIT specific)
+        $content = $content -replace '@GC64_FLAG@', "-DLUAJIT_ENABLE_GC64"
+
+        # Save to source directory
+        Set-Content -Path $cmakeFile -Value $content -Encoding UTF8
+        Write-InfoLog "📝 Generated CMakeLists.txt for LuaJIT $Version"
+
+        # === 2. Prepare clean build directory ===
+        $buildDir = Join-Path $SourcePath "build-$Compiler"
+        if (Test-Path $buildDir) {
+            Remove-Item $buildDir -Recurse -Force -ErrorAction SilentlyContinue
         }
-        else {
-            Write-InfoLog "♻️ Updating LuaJIT repository"
-            Push-Location $sourcePath
-            & git checkout v2.1
-            & git pull origin v2.1
-            & git reset --hard
-            & git clean -fdx
-            Pop-Location
-        }
+        New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 
-        Push-Location $sourcePath
-
-        # Get version information
-        $commitHash = & git rev-parse --short HEAD
-        $version = "2.1-$commitHash"
-        Write-InfoLog "💡 Building LuaJIT version: $version"
-
-        # Apply critical Windows patch
-        $patchApplied = $false
-        $makefilePath = Join-Path $sourcePath "src" "Makefile"
-        if (Test-Path $makefilePath) {
-            $makefileContent = Get-Content $makefilePath -Raw
-
-            # Patch 1: Replace uname dependency
-            $makefileContent = $makefileContent -replace 'HOST_SYS\s*:=\s*\$\(shell uname -s\)', 'HOST_SYS := Windows'
-
-            # Patch 2: Fix version generation
-            $makefileContent = $makefileContent -replace '\.\/ljarch\.h', 'ljarch.h'
-
-            Set-Content $makefilePath $makefileContent
-            $patchApplied = $true
-            Write-VerboseLog "🔧 Applied critical Makefile patches"
-        }
-
-        # Build
-        Write-InfoLog "🏗️ Building LuaJIT $version ($buildMode) with $Compiler"
-
-        # Set compiler environment variables
-        $env:CC = if ($Compiler -eq "clang") { "clang" } else { "gcc" }
-        $env:HOST_CC = $env:CC
-
-        # Determine best make command to use
-        $makeCmd = if (Get-Command "mingw32-make" -ErrorAction SilentlyContinue) {
-            "mingw32-make"
-        } else {
-            "make"
-        }
-
-        # Build flags
-        $buildArgs = @(
-            "BUILDMODE=$buildMode",
-            "TARGET_SYS=Windows",
-            "HOST_SYS=Windows",
-            "Q="  # Quiet mode
+        # === 3. Construct CMake arguments ===
+        $cmakeArgs = @(
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DTARGET_SYS=Windows"
         )
 
-        # Add Clang-specific flags
-        if ($Compiler -eq "clang") {
-            $buildArgs += "CCFLAGS=-integrated-as"
-            $buildArgs += "ASFLAGS=-integrated-as"
-            $buildArgs += "XCFLAGS=-DLUAJIT_ENABLE_GC64"
-        } else {
-            $buildArgs += "XCFLAGS=-DLUAJIT_ENABLE_GC64"
-        }
-
-        # Build
-        Write-VerboseLog "🔧 Running: $makeCmd $($buildArgs -join ' ')"
-        & $makeCmd @buildArgs 2>&1 | Tee-Object -Variable buildOutput
-        if ($LASTEXITCODE -ne 0) {
-            throw "Build failed with exit code $LASTEXITCODE"
-        }
-
-        # Install artifacts
-        $artifactPath = Get-ArtifactPath -Engine "luajit" -Version $version -BuildType $BuildType -Compiler $Compiler -Create
-
-        # Copy binaries
-        $binaries = @("luajit.exe", "lua51.dll")
-        $copiedFiles = 0
-
-        $binaries | ForEach-Object {
-            $sourceFile = Join-Path "src" $_
-            if (Test-Path $sourceFile) {
-                Copy-Item $sourceFile $artifactPath -Force
-                $copiedFiles++
-                Write-VerboseLog "📦 Copied: $sourceFile"
+        switch ($Compiler) {
+            "clang" {
+                $cmakeArgs += "-DCMAKE_C_COMPILER=clang"
+                # Apply integrated AS flag for Clang
+                $cmakeArgs += "-DCMAKE_ASM_FLAGS=-integrated-as"
             }
+            "mingw" { $cmakeArgs += @("-G", "MinGW Makefiles") }
+            "msvc"  { $cmakeArgs += "-A", "x64" }
         }
 
-        # Copy static library if exists
-        $libName = if ($BuildType -eq "static") { "luajit.lib" } else { "lua51.lib" }
-        $libPath = Join-Path "src" $libName
-        if (Test-Path $libPath) {
-            Copy-Item $libPath $artifactPath -Force
-            $copiedFiles++
-            Write-VerboseLog "📦 Copied: $libPath"
-        }
+        # === 4. Build with CMake ===
+        Push-Location $buildDir
+        try {
+            Write-InfoLog "🛠️ Configuring CMake for LuaJIT $Version"
+            & cmake $SourcePath @cmakeArgs
+            if ($LASTEXITCODE -ne 0) { throw "CMake configuration failed" }
 
-        if ($copiedFiles -eq 0) {
-            throw "No binaries found in src directory"
-        }
+            Write-InfoLog "🏗️ Building LuaJIT $Version..."
+            & cmake --build . --config Release --parallel
+            if ($LASTEXITCODE -ne 0) { throw "CMake build failed" }
 
-        Write-InfoLog "✅ Copied $copiedFiles files to $artifactPath"
-        return $version
+            # === 5. Copy compiled artifacts ===
+            $outDir = Get-ArtifactPath -Engine "luajit" -Version $Version -BuildType $BuildType -Compiler $Compiler -Create
+            $binDir = if (Test-Path "$buildDir/bin") { "$buildDir/bin" } else { $buildDir }
+
+            $copied = 0
+            $expectedFiles = @("luajit.exe", "lua51.dll", "luajit.lib", "lua51.lib")
+
+            foreach ($file in $expectedFiles) {
+                $sourceFile = Join-Path $binDir $file
+                if (Test-Path $sourceFile) {
+                    Copy-Item -Path $sourceFile -Destination $outDir -Force
+                    Write-VerboseLog "📦 Copied: $file"
+                    $copied++
+                }
+            }
+
+            if ($copied -eq 0) {
+                throw "No compiled binaries found in: $binDir"
+            }
+
+            Write-InfoLog "✅ Build successful — $copied artifacts saved to: $outDir"
+            return $true
+        }
+        catch {
+            Write-ErrorLog "❌ Build-LuaJIT failed: $($_.Exception.Message)"
+            return $false
+        }
+        finally {
+            Pop-Location
+        }
     }
     catch {
-        $errorMessage = $_.Exception.Message
-        Write-ErrorLog "❌ LuaJIT build failed: $errorMessage"
-        return $null
-    }
-    finally {
-        Pop-Location
+        Write-ErrorLog "❌ LuaJIT build preparation failed: $($_.Exception.Message)"
+        return $false
     }
 }
 
