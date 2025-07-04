@@ -1,37 +1,63 @@
 # versioning.psm1
-# 🔢 Version parsing, latest detection, and support validation
+# 🔢 Version parsing, detection, and engine-specific validation for luaDev
 
-$script:SupportedVersions = @("5.4", "5.3", "5.2", "5.1")
+$script:SupportedLuaVersions    = @("5.1", "5.2", "5.3", "5.4")
+$script:SupportedLuaJITVersions = @("2.0", "2.1")
 
-function Get-LatestLuaVersions {
-    try {
-        $response = Invoke-WebRequest "https://www.lua.org/versions.html" -UseBasicParsing -ErrorAction Stop
-        $versions = [regex]::Matches($response.Content, 'lua-(\d+\.\d+\.\d+)\.tar\.gz') |
-            ForEach-Object { $_.Groups[1].Value } |
-            Where-Object { $_ -match "5\.(1|2|3|4)" } |
-            Sort-Object { [System.Version]$_ } -Descending |
-            Select-Object -First 4
+function Get-LatestEngineVersions {
+    <#
+    .SYNOPSIS
+        Returns the latest supported versions for a given engine.
+    .PARAMETER Engine
+        Either 'lua' or 'luajit'
+    #>
+    param (
+        [Parameter(Mandatory)][ValidateSet("lua", "luajit")]
+        [string]$Engine
+    )
 
-        return $versions
-    }
-    catch {
-        Write-WarningLog "⚠️ Using fallback versions (network error)"
-        return @("5.4.8", "5.3.6", "5.2.4", "5.1.5")
+    switch ($Engine) {
+        "lua" {
+            try {
+                $response = Invoke-WebRequest "https://www.lua.org/versions.html" -UseBasicParsing -ErrorAction Stop
+                return [regex]::Matches($response.Content, 'lua-(\d+\.\d+\.\d+)\.tar\.gz') |
+                    ForEach-Object { $_.Groups[1].Value } |
+                    Where-Object { $_ -match "^5\.(1|2|3|4)" } |
+                    Sort-Object { [System.Version]$_ } -Descending |
+                    Select-Object -First 4
+            } catch {
+                Write-WarningLog "⚠️ Could not fetch from lua.org — using fallback"
+                return @("5.4.8", "5.3.6", "5.2.4", "5.1.5")
+            }
+        }
+
+        "luajit" {
+            # LuaJIT has fewer versions and no consistent online source
+            return @("2.1.0-beta3", "2.0.5")
+        }
     }
 }
 
 function Convert-VersionShorthand {
-    param([string]$InputVersion)
+    <#
+    .SYNOPSIS
+        Normalizes shorthand versions like 540 or 54 to 5.4.0.
+    .PARAMETER InputVersion
+        Raw version input from user or manifest
+    #>
+    param (
+        [string]$InputVersion
+    )
 
     if ($InputVersion -match '^\d+\.\d+\.\d+$') {
         return $InputVersion
     }
 
-    if ($InputVersion -match '^(\d{1})(\d{1})(\d{1})$') {
+    if ($InputVersion -match '^(\d)(\d)(\d)$') {
         return "$($Matches[1]).$($Matches[2]).$($Matches[3])"
     }
 
-    if ($InputVersion -match '^(\d{1})(\d{1})$') {
+    if ($InputVersion -match '^(\d)(\d)$') {
         return "$($Matches[1]).$($Matches[2]).0"
     }
 
@@ -39,10 +65,28 @@ function Convert-VersionShorthand {
 }
 
 function Test-IsSupportedVersion {
-    param([string]$Version)
+    <#
+    .SYNOPSIS
+        Determines if a version is supported by luaDev.
+    .PARAMETER Engine
+        lua or luajit
+    .PARAMETER Version
+        Semantic version (e.g., 5.4.8 or 2.1.0-beta3)
+    #>
+    param (
+        [Parameter(Mandatory)][ValidateSet("lua", "luajit")]
+        [string]$Engine,
 
-    $baseVersion = $Version.Substring(0, 3)
-    return $script:SupportedVersions -contains $baseVersion
+        [Parameter(Mandatory)]
+        [string]$Version
+    )
+
+    $base = ($Version -split '\.')[0..1] -join '.'
+
+    switch ($Engine) {
+        "lua"    { return $script:SupportedLuaVersions -contains $base }
+        "luajit" { return $script:SupportedLuaJITVersions -contains $base }
+    }
 }
 
-Export-ModuleMember -Function Get-LatestLuaVersions, Convert-VersionShorthand, Test-IsSupportedVersion
+Export-ModuleMember -Function Get-LatestEngineVersions, Convert-VersionShorthand, Test-IsSupportedVersion

@@ -1,0 +1,159 @@
+# ===================================================
+# Lua 5.1 Specific Configuration
+# ===================================================
+# Applied after base template - contains 5.1-specific settings
+# ===================================================
+
+# 1. COMPATIBILITY SETTINGS
+# Maintain compatibility with Lua 5.0 APIs
+target_compile_definitions(lua PRIVATE LUA_COMPAT_ALL)
+
+# 2. VERSION PROPERTIES
+set_target_properties(lua PROPERTIES
+    VERSION "${LUA_VERSION}"
+    SOVERSION "5.1"
+)
+
+# 3. CORE LIBRARIES
+# 3.1 Base Libraries Configuration
+target_compile_definitions(lua PRIVATE
+    LUA_USE_BASELIB
+    LUA_USE_PACKLIB
+    LUA_USE_STRLIB
+    LUA_USE_MATHLIB
+    LUA_USE_IOLIB
+    LUA_USE_OSLIB
+    LUA_USE_DBLIB
+    LUA_USE_TABLIB
+)
+
+# 4. MODULE SYSTEM
+# Original module loading system
+target_compile_definitions(lua PRIVATE
+    LUA_USE_MODULE_SYSTEM_5_1
+    LUA_USE_LOADLIB
+)
+
+# 5. MEMORY MANAGEMENT
+# Conservative garbage collector
+target_compile_definitions(lua PRIVATE
+    LUA_USE_CONSERVATIVE_GC
+)
+
+# 6. PERFORMANCE OPTIMIZATIONS
+# 6.1 Table Optimization
+target_compile_definitions(lua PRIVATE LUA_USE_TABLE_OPT)
+
+# 6.2 String Hash Optimization
+target_compile_definitions(lua PRIVATE LUA_USE_STRING_HASH_OPT)
+
+# 7. DEBUGGING SUPPORT
+target_compile_definitions(lua PRIVATE
+    LUA_USE_DEBUG
+    LUA_USE_TRACE
+)
+
+# 8. PLATFORM-SPECIFIC CONFIGURATION
+if(WIN32)
+    # 8.1 Windows Console Support
+    target_compile_definitions(lua PRIVATE LUA_USE_WINDOWS_CONSOLE)
+
+    # 8.2 Math Library Linking
+    target_link_libraries(lua m)
+
+    # 8.3 Stack Size (1MB)
+    set_target_properties(lua PROPERTIES LINK_FLAGS "/STACK:1048576")
+
+    # 8.4 DLL Export Handling
+    if(BUILD_SHARED_LIBS)
+        target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
+    endif()
+else()
+    # 8.5 POSIX-specific Settings
+    target_compile_definitions(lua PRIVATE LUA_USE_POSIX)
+
+    # 8.6 Stack Size (1MB)
+    set_target_properties(lua PROPERTIES LINK_FLAGS "-Wl,--stack-size,1048576")
+endif()
+
+# 9. COMPILER FLAGS
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    # 9.1 General Optimization
+    target_compile_options(lua PRIVATE
+        -O2
+        -fno-strict-aliasing
+    )
+
+    # 9.2 Warnings and Diagnostics
+    target_compile_options(lua PRIVATE
+        -Wno-implicit-function-declaration
+        -Wno-strict-prototypes
+        -Wno-missing-prototypes
+    )
+
+    # 9.3 Position Independent Code
+    if(BUILD_SHARED_LIBS)
+        target_compile_options(lua PRIVATE -fPIC)
+    endif()
+
+    # 9.4 Compatibility Flags
+    target_compile_options(lua PRIVATE -DLUA_ANSI)
+
+elseif(MSVC)
+    # 9.5 MSVC-specific Flags
+    target_compile_options(lua PRIVATE
+        /O2
+        /wd4996   # _CRT_SECURE_NO_WARNINGS
+        /wd4013   # implicit function declaration
+        /wd4131   # uses old-style declarator
+    )
+
+    # 9.6 ANSI Compatibility
+    target_compile_definitions(lua PRIVATE LUA_ANSI)
+endif()
+
+# 10. STANDARD COMPLIANCE
+set_target_properties(lua PROPERTIES
+    C_STANDARD 89
+    C_EXTENSIONS ON
+)
+
+# 11. DEPRECATION HANDLING
+# No deprecation warnings for 5.1 - many "deprecated" features are standard
+
+# 12. INSTALLATION CONFIGURATION
+install(FILES
+    src/lua.h
+    src/luaconf.h
+    src/lauxlib.h
+    src/lualib.h
+    DESTINATION include
+)
+
+# 13. LEGACY FEATURE SUPPORT
+option(LUA_USE_LEGACY_FEATURES "Enable legacy Lua 5.0 features" ON)
+if(LUA_USE_LEGACY_FEATURES)
+    target_compile_definitions(lua PRIVATE
+        LUA_USE_GLOBAL_NAMESPACE
+        LUA_USE_GETN
+        LUA_USE_LOADSTRING
+    )
+endif()
+
+# 14. COMPATIBILITY WITH LUAJIT
+option(LUA_USE_LUAJIT_COMPAT "Enable LuaJIT compatibility features" OFF)
+if(LUA_USE_LUAJIT_COMPAT)
+    target_compile_definitions(lua PRIVATE
+        LUA_USE_LUAJIT_FFI
+        LUA_USE_LUAJIT_JIT
+    )
+
+    # Add LuaJIT compatibility layer
+    list(APPEND LUA_CORE_SOURCES
+        "compat/lj_compat.c"
+    )
+endif()
+
+# ===================================================
+# END Lua 5.1 Configuration
+# ===================================================

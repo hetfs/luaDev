@@ -1,4 +1,7 @@
 # export.psm1 — Log Export Helpers for luaDev (Markdown formatter)
+# Example Usage:
+# Export-LogAsMarkdown -MarkdownPath "logs/Lua/5.4.8.md" -LogLines $lines -Title "Lua 5.4.8 Log"
+# Export-LogAsMarkdown -MarkdownPath "test.md" -LogLines $lines -DryRun -Verbose
 
 # 🛡️ Fallback logging in case main logging module isn't loaded
 if (-not (Get-Command Write-InfoLog -ErrorAction SilentlyContinue)) {
@@ -7,26 +10,36 @@ if (-not (Get-Command Write-InfoLog -ErrorAction SilentlyContinue)) {
 if (-not (Get-Command Write-ErrorLog -ErrorAction SilentlyContinue)) {
     function Write-ErrorLog { param($msg) Write-Host "[ERROR] $msg" -ForegroundColor Red }
 }
+if (-not (Get-Command Write-WarningLog -ErrorAction SilentlyContinue)) {
+    function Write-WarningLog { param($msg) Write-Host "[WARN] $msg" -ForegroundColor Yellow }
+}
 
 function Export-LogAsMarkdown {
     <#
     .SYNOPSIS
-        Converts PowerShell log lines to a themed Markdown `.md` file grouped by engine and version.
+        Converts log lines into a themed Markdown log grouped by engine/version.
+
     .PARAMETER MarkdownPath
-        Full path to the output `.md` file.
+        Path to write the `.md` log file.
+
     .PARAMETER LogLines
-        Raw log lines (array from Get-Content).
+        Raw log lines to format into Markdown.
+
     .PARAMETER Title
-        Optional page title.
+        Optional Markdown page title.
+
+    .PARAMETER DryRun
+        Simulates export without writing to disk.
     #>
     param(
-        [Parameter(Mandatory = $true)] [string]$MarkdownPath,
-        [Parameter(Mandatory = $true)] [string[]]$LogLines,
-        [string]$Title = "📝 Build Log"
+        [Parameter(Mandatory)][string]$MarkdownPath,
+        [Parameter(Mandatory)][string[]]$LogLines,
+        [string]$Title = "📝 Build Log",
+        [switch]$DryRun
     )
 
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
-    $newline = [Environment]::NewLine
+    $newline   = [Environment]::NewLine
 
     $header = @"
 # $Title
@@ -116,6 +129,11 @@ function Export-LogAsMarkdown {
                 $content += ($logs.Other -join $newline)
                 $content += "$newline```$newline"
             }
+        }
+
+        if ($DryRun) {
+            Write-InfoLog "[DryRun] Would export Markdown log to: $MarkdownPath"
+            return
         }
 
         Set-Content -Path $MarkdownPath -Value $content -Encoding UTF8

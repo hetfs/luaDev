@@ -1,19 +1,226 @@
-# LuaJIT specific configurations
-if(WIN32)
-    target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
-endif()
+# ===================================================
+# LuaJIT Specific Configuration
+# ===================================================
+# Applied after base template - contains LuaJIT-specific settings
+# Placeholders:
+#   @GC64_FLAG@ → Replaced with GC64 compiler flag
+#   ${LUA_VERSION_MAJOR} → Major version (2)
+#   ${LUA_VERSION_MINOR} → Minor version (1)
+# ===================================================
 
+# 1. ENGINE IDENTIFICATION
+set(LUA_ENGINE "luajit")
+
+# 2. VERSION PROPERTIES
 set_target_properties(lua PROPERTIES
-    VERSION ${LUA_VERSION}
-    SOVERSION ${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR}
+    VERSION "${LUA_VERSION}"
+    SOVERSION "${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR}"
 )
 
-# Additional sources and GC64 flag
-list(APPEND LUA_SOURCES
+# 3. CORE SOURCES
+# LuaJIT requires additional source files
+list(APPEND LUA_CORE_SOURCES
     "src/lj_*.c"
     "src/lj_*.h"
     "src/ljamalg.c"
+    "src/lib_aux.c"
+    "src/lib_base.c"
+    "src/lib_bit.c"
+    "src/lib_debug.c"
+    "src/lib_ffi.c"
+    "src/lib_init.c"
+    "src/lib_io.c"
+    "src/lib_jit.c"
+    "src/lib_math.c"
+    "src/lib_os.c"
+    "src/lib_package.c"
+    "src/lib_string.c"
+    "src/lib_table.c"
 )
 
-# GC64 mode flag
+# 4. JIT COMPILER CONFIGURATION
+option(LUAJIT_ENABLE_JIT "Enable JIT compiler" ON)
+if(LUAJIT_ENABLE_JIT)
+    target_compile_definitions(lua PRIVATE LUAJIT_ENABLE_JIT)
+else()
+    target_compile_definitions(lua PRIVATE LUAJIT_DISABLE_JIT)
+endif()
+
+# 5. ARCHITECTURE SELECTION
+# Default to x64, but allow customization
+set(LUAJIT_ARCH "x64" CACHE STRING "Target architecture (x86, x64, arm, etc.)")
+target_compile_definitions(lua PRIVATE
+    LUAJIT_TARGET=LUAJIT_ARCH_${LUAJIT_ARCH}
+)
+
+# 6. MEMORY MANAGEMENT
+# 6.1 GC64 Mode Configuration
 target_compile_definitions(lua PRIVATE @GC64_FLAG@)
+
+# 6.2 Custom Allocator Support
+option(LUAJIT_USE_SYSMALLOC "Use system allocator instead of LuaJIT's" OFF)
+if(NOT LUAJIT_USE_SYSMALLOC)
+    target_compile_definitions(lua PRIVATE LUAJIT_USE_VALGRIND)
+    list(APPEND LUA_CORE_SOURCES "src/lj_alloc.c")
+endif()
+
+# 7. FFI SUPPORT
+option(LUAJIT_ENABLE_FFI "Enable foreign function interface" ON)
+if(LUAJIT_ENABLE_FFI)
+    target_compile_definitions(lua PRIVATE LUAJIT_ENABLE_FFI)
+    # FFI requires libdl on POSIX systems
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(lua dl)
+    endif()
+endif()
+
+# 8. DEBUGGING SUPPORT
+option(LUAJIT_USE_APICHECK "Enable API checks" OFF)
+option(LUAJIT_USE_ASSERT "Enable assertions" OFF)
+
+if(LUAJIT_USE_APICHECK)
+    target_compile_definitions(lua PRIVATE LUAJIT_USE_APICHECK)
+endif()
+
+if(LUAJIT_USE_ASSERT)
+    target_compile_definitions(lua PRIVATE LUAJIT_USE_ASSERT)
+endif()
+
+# 9. OPTIMIZATION FLAGS
+# 9.1 Architecture-specific optimizations
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86|x86_64")
+    target_compile_definitions(lua PRIVATE
+        LUAJIT_ENABLE_CHECKHOOK
+        LUAJIT_CPU_SSE2
+    )
+
+    # Enable SSE2 by default on x86/x64
+    if(MSVC)
+        target_compile_options(lua PRIVATE /arch:SSE2)
+    else()
+        target_compile_options(lua PRIVATE -msse2)
+    endif()
+endif()
+
+# 9.2 Link-Time Optimization
+if(NOT MSVC)
+    set_target_properties(lua PROPERTIES
+        INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
+    )
+endif()
+
+# 10. PLATFORM-SPECIFIC CONFIGURATION
+if(WIN32)
+    # 10.1 Windows DLL Configuration
+    if(BUILD_SHARED_LIBS)
+        target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
+    endif()
+
+    # 10.2 Console Handling
+    target_compile_definitions(lua PRIVATE
+        LUAJIT_USE_WINDOWS_CONSOLE
+    )
+
+    # 10.3 Stack Size (4MB)
+    set_target_properties(lua PROPERTIES LINK_FLAGS "/STACK:4194304")
+
+    # 10.4 Manifest File Handling
+    set_target_properties(lua PROPERTIES
+        VS_DEBUGGER_ENVIRONMENT "PATH=$(OutDir);%PATH%"
+    )
+else()
+    # 10.5 POSIX Configuration
+    target_compile_definitions(lua PRIVATE
+        LUAJIT_USE_POSIX
+        LUAJIT_USE_DLOPEN
+    )
+
+    # 10.6 Stack Size (4MB)
+    set_target_properties(lua PROPERTIES LINK_FLAGS "-Wl,-z,stack-size=4194304")
+endif()
+
+# 11. COMPILER-SPECIFIC FLAGS
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    # 11.1 General Optimization
+    target_compile_options(lua PRIVATE
+        -O3
+        -fomit-frame-pointer
+        -funroll-loops
+    )
+
+    # 11.2 Warning Suppression
+    target_compile_options(lua PRIVATE
+        -Wno-maybe-uninitialized
+        -Wno-array-bounds
+        -Wno-format-truncation
+    )
+
+    # 11.3 Strict Aliasing
+    target_compile_options(lua PRIVATE -fno-strict-aliasing)
+
+elseif(MSVC)
+    # 11.4 MSVC Optimization
+    target_compile_options(lua PRIVATE
+        /O2
+        /Oy-  # Disable frame pointer omission
+    )
+
+    # 11.5 Warning Suppression
+    target_compile_options(lua PRIVATE
+        /wd4146  # unary minus operator applied to unsigned type
+        /wd4244  # conversion from 'int' to 'char', possible loss of data
+        /wd4293  # shift count negative or too big
+    )
+
+    # 11.6 Inline Expansion
+    target_compile_options(lua PRIVATE /Ob2)
+endif()
+
+# 12. CUSTOM TARGETS
+# 12.1 luajit executable
+add_executable(luajit src/luajit.c)
+target_link_libraries(luajit lua)
+set_target_properties(luajit PROPERTIES
+    OUTPUT_NAME "luajit-${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR}"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+
+# 12.2 Install targets
+install(TARGETS luajit RUNTIME DESTINATION bin)
+
+# 13. TEST SUPPORT
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/luajit-test.c")
+    add_executable(luajit-test src/luajit-test.c)
+    target_link_libraries(luajit-test lua)
+endif()
+
+# 14. HOST BUILDER (for cross-compilation)
+if(CMAKE_CROSSCOMPILING)
+    add_executable(luajit-host src/host/buildvm.c)
+    set_target_properties(luajit-host PROPERTIES
+        EXCLUDE_FROM_ALL TRUE
+        EXCLUDE_FROM_DEFAULT_BUILD TRUE
+    )
+
+    # Custom command to build minilua using host compiler
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/host/minilua
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/host
+        COMMAND ${CMAKE_C_COMPILER} $<TARGET_OBJECTS:luajit-host> -o ${CMAKE_BINARY_DIR}/host/minilua
+        DEPENDS luajit-host
+    )
+endif()
+
+# 15. VERSION-SPECIFIC DEFINES
+# LuaJIT 2.1+ specific features
+if(LUA_VERSION_MINOR VERSION_GREATER_EQUAL "1")
+    target_compile_definitions(lua PRIVATE
+        LUAJIT_51_COMPAT
+        LUAJIT_52_COMPAT
+        LUAJIT_53_COMPAT
+    )
+endif()
+
+# ===================================================
+# END LuaJIT Configuration
+# ===================================================

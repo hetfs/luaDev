@@ -1,53 +1,59 @@
+# manifest.psm1
+# 🧾 Exports structured JSON + Markdown manifest of Lua builds
+# Usage Example:
+# Export-LuaBuildManifest -Artifacts $artifactList -DryRun
+
 function Export-LuaBuildManifest {
-    param([array]$Artifacts)
+    param(
+        [Parameter(Mandatory)][array]$Artifacts,
+        [string]$DefaultArchitecture,
+        [switch]$DryRun
+    )
 
-    function Get-OSPlatform {
-        return @{
-            Platform     = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription.Trim()
-            Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
-        }
+    # 🔁 Get system info
+    $osInfo = Get-OSPlatform
+    if (-not $DefaultArchitecture) {
+        $DefaultArchitecture = $osInfo.Architecture
     }
 
-    function Get-ManifestsRoot {
-        $root = Join-Path $PSScriptRoot "..\..\manifests"
-        if (-not (Test-Path $root)) {
-            New-Item -ItemType Directory -Path $root -Force | Out-Null
-        }
-        return $root
-    }
-
+    $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
     $manifestsRoot = Get-ManifestsRoot
     $jsonPath = Join-Path $manifestsRoot "manifest.json"
     $mdPath   = Join-Path $manifestsRoot "manifest.md"
-    $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
-    $osInfo = Get-OSPlatform
 
-    # 🧱 Build structured JSON
-    $manifest = @{
-        Timestamp = $timestamp
-        System = @{
-            Platform     = $osInfo.Platform
-            Architecture = $osInfo.Architecture
-        }
-        Artifacts = $Artifacts | ForEach-Object {
-            @{
-                Engine      = $_.Engine
-                Version     = $_.Version
-                BuildType   = $_.BuildType
-                Compiler    = $_.Compiler
-                Success     = $_.Success
-                Path        = Join-Path "binaries" "$($_.Engine)-$($_.Version)-$($_.BuildType)-$($_.Compiler)-$($osInfo.Architecture)"
-            }
+    # 📦 Normalize artifact data
+    $manifestArtifacts = $Artifacts | ForEach-Object {
+        $artifactArch = if ($_.Architecture) { $_.Architecture } else { $DefaultArchitecture }
+
+        [PSCustomObject]@{
+            Engine       = $_.Engine
+            Version      = $_.Version
+            BuildType    = $_.BuildType
+            Compiler     = $_.Compiler
+            Success      = $_.Success
+            Architecture = $artifactArch
+            Path         = "binaries/$($_.Engine)-$($_.Version)-$($_.BuildType)-$($_.Compiler)-$artifactArch"
         }
     }
 
-    # 💾 Save JSON
-    $manifest | ConvertTo-Json -Depth 10 | Set-Content -Path $jsonPath -Encoding UTF8
-    Write-Host "📄 JSON manifest exported: $jsonPath"
+    # 🧱 JSON Structure
+    $manifest = @{
+        Timestamp = $timestamp
+        System    = $osInfo
+        Artifacts = $manifestArtifacts
+    }
 
-    # 📝 Markdown table
-    $successCount = ($Artifacts | Where-Object { $_.Success }).Count
-    $totalCount   = $Artifacts.Count
+    # 💾 Save JSON
+    if (-not $DryRun) {
+        $manifest | ConvertTo-Json -Depth 10 | Set-Content -Path $jsonPath -Encoding UTF8
+        Write-InfoLog "📄 JSON manifest exported: $jsonPath"
+    } else {
+        Write-VerboseLog "[DryRun] Would export JSON to: $jsonPath"
+    }
+
+    # 📝 Markdown formatting
+    $successCount = ($manifestArtifacts | Where-Object { $_.Success }).Count
+    $totalCount   = $manifestArtifacts.Count
 
     $mdHeader = @"
 # 📦 Lua Build Manifest
@@ -58,19 +64,23 @@ function Export-LuaBuildManifest {
 
 ## 🔍 Artifacts
 
-| Engine  | Version | Build Type | Compiler | Status     | Binary Path |
-|---------|---------|------------|----------|------------|-------------|
+| Engine  | Version | Build Type | Compiler | Architecture | Status     | Binary Path |
+|---------|---------|------------|----------|--------------|------------|-------------|
 "@
 
-    $mdRows = $Artifacts | ForEach-Object {
+    $mdRows = $manifestArtifacts | ForEach-Object {
         $status = if ($_.Success) { "✅ Success" } else { "❌ Failed" }
-        $binPath = "binaries/$($_.Engine)-$($_.Version)-$($_.BuildType)-$($_.Compiler)-$($osInfo.Architecture)"
-        "| $($_.Engine) | $($_.Version) | $($_.BuildType) | $($_.Compiler) | $status | $binPath |"
+        "| $($_.Engine) | $($_.Version) | $($_.BuildType) | $($_.Compiler) | $($_.Architecture) | $status | $($_.Path) |"
     }
 
     $mdContent = $mdHeader + ($mdRows -join "`n") + "`n"
-    $mdContent | Set-Content -Path $mdPath -Encoding UTF8
-    Write-Host "📝 Markdown manifest exported: $mdPath"
+
+    if (-not $DryRun) {
+        $mdContent | Set-Content -Path $mdPath -Encoding UTF8
+        Write-InfoLog "📝 Markdown manifest exported: $mdPath"
+    } else {
+        Write-VerboseLog "[DryRun] Would export Markdown to: $mdPath"
+    }
 }
 
 Export-ModuleMember -Function Export-LuaBuildManifest

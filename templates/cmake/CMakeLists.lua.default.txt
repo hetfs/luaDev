@@ -1,0 +1,159 @@
+# ==============================================================
+# Lua/LuaJIT CMake Build Template - Version-Agnostic Base
+# ==============================================================
+# Placeholders replaced during build:
+#   @LIBRARY_TYPE@    → STATIC or SHARED
+#   @SHARED_FLAG@     → ON or OFF
+#   ${LUA_VERSION}    → Version (5.1, 5.2, 5.3, 5.4, 2.1)
+#   ${LUA_ENGINE}     → lua or luajit
+#   @VERSION_SPECIFIC@→ Version-specific configuration block
+# ==============================================================
+
+cmake_minimum_required(VERSION 3.12)
+project(lua C)
+
+# =====================
+# 1. Core Configuration
+# =====================
+set(LUA_VERSION ${LUA_VERSION})
+set(LUA_ENGINE ${LUA_ENGINE})
+option(BUILD_SHARED_LIBS "Build shared library" @SHARED_FLAG@)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# ===================
+# 2. Source Discovery
+# ===================
+# Base sources common to all versions
+file(GLOB LUA_CORE_SOURCES
+    "src/*.c"
+    "src/*.h"
+)
+
+# Version-specific source adjustments
+if(LUA_ENGINE STREQUAL "lua")
+    # Lua-specific sources (all versions)
+    list(APPEND LUA_CORE_SOURCES
+        "src/lapi.c"
+        "src/lcode.c"
+        "src/ldebug.c"
+        "src/ldo.c"
+        "src/ldump.c"
+        "src/lfunc.c"
+        "src/lgc.c"
+        "src/llex.c"
+        "src/lmem.c"
+        "src/lobject.c"
+        "src/lopcodes.c"
+        "src/lparser.c"
+        "src/lstate.c"
+        "src/lstring.c"
+        "src/ltable.c"
+        "src/ltm.c"
+        "src/lundump.c"
+        "src/lvm.c"
+        "src/lzio.c"
+        "src/lauxlib.c"
+        "src/lbaselib.c"
+        "src/ldblib.c"
+        "src/liolib.c"
+        "src/lmathlib.c"
+        "src/loadlib.c"
+        "src/loslib.c"
+        "src/ltablib.c"
+        "src/lstrlib.c"
+        "src/linit.c"
+    )
+
+    # Lua 5.2+ additions
+    if(LUA_VERSION VERSION_GREATER_EQUAL "5.2")
+        list(APPEND LUA_CORE_SOURCES "src/lbitlib.c")
+    endif()
+
+    # Lua 5.3+ additions
+    if(LUA_VERSION VERSION_GREATER_EQUAL "5.3")
+        list(APPEND LUA_CORE_SOURCES "src/lutf8lib.c")
+    endif()
+
+    # Lua 5.4+ additions
+    if(LUA_VERSION VERSION_GREATER_EQUAL "5.4")
+        list(APPEND LUA_CORE_SOURCES "src/lcorolib.c")
+    endif()
+endif()
+
+# ============================
+# 3. Executable Configuration
+# ============================
+option(BUILD_STANDALONE "Build standalone interpreter" ON)
+
+if(BUILD_STANDALONE)
+    set(EXECUTABLE_SOURCES "src/lua.c")
+else()
+    # Remove standalone interpreter from library sources
+    list(REMOVE_ITEM LUA_CORE_SOURCES "src/lua.c")
+endif()
+
+# ===================
+# 4. Library Targets
+# ===================
+add_library(lua @LIBRARY_TYPE@ ${LUA_CORE_SOURCES})
+target_include_directories(lua PUBLIC src)
+
+if(BUILD_STANDALONE)
+    add_executable(lua_exe ${EXECUTABLE_SOURCES})
+    target_link_libraries(lua_exe lua)
+    set_target_properties(lua_exe PROPERTIES OUTPUT_NAME "lua")
+endif()
+
+# ================================
+# 5. Version-Specific Adjustments
+# ================================
+@VERSION_SPECIFIC@
+
+# ======================
+# 6. Installation Setup
+# ======================
+install(TARGETS lua
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+if(BUILD_STANDALONE)
+    install(TARGETS lua_exe RUNTIME DESTINATION bin)
+endif()
+
+install(FILES
+    src/lua.h
+    src/luaconf.h
+    src/lauxlib.h
+    src/lualib.h
+    DESTINATION include
+)
+
+# =========================
+# 7. Platform-Specific Fixes
+# =========================
+if(WIN32)
+    # Windows DLL export handling
+    if(BUILD_SHARED_LIBS)
+        target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
+    endif()
+
+    # MSVC runtime configuration
+    if(MSVC)
+        target_compile_options(lua PRIVATE /W3 /MT$<$<CONFIG:Debug>:d>)
+        set_target_properties(lua PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    endif()
+endif()
+
+# ===========================
+# 8. Compiler-Specific Flags
+# ===========================
+if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    target_compile_options(lua PRIVATE -Wno-implicit-fallthrough)
+endif()
+
+# =================================================
+# END OF BASE TEMPLATE
+# Version/engine-specific content injected below ↓
+# =================================================

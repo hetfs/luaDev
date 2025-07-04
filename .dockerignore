@@ -1,42 +1,60 @@
-# LuaDev-specific
+########################################################
+# 🧠 LuaDev-Specific Binaries, Modules & Build Artifacts
+########################################################
 luaBinary/
-scripts/logs/
 scripts/modules/
-*.manifest.json
-*.testlog
-*.log
-*.bak
-*.tmp
-*.cache
 *.luac
 *.ps1xml
 *.psd1
 *.psm1~
 
-# Docusaurus build output
+########################################################
+# 📝 Logs & Temporary Files
+########################################################
+scripts/logs/
+*.log
+*.testlog
+*.manifest.json
+*.bak
+*.tmp
+*.cache
+
+########################################################
+# 🚀 Docusaurus & Node.js Output
+########################################################
 build/
 .docusaurus/
 node_modules/
-.cache-loader
+.cache-loader/
 coverage/
 *.lcov
 
-# Git and version control
+########################################################
+# ⚙️ Git & Version Control
+########################################################
 .git
 .gitignore
 .gitattributes
 
-# Env and system
-.env*
-.envrc*
+########################################################
+# 🌍 Environment & Local Configuration
+########################################################
+.env
+.env.*
+.envrc
+.envrc.*
 *.local
 
-# Editors/IDEs
+########################################################
+# 🧠 Editor / IDE Metadata
+########################################################
 .vscode/
 .idea/
 *.code-workspace
 
-# OS-specific
+########################################################
+# 💻 OS-Specific Files
+########################################################
 .DS_Store
 Thumbs.db
 ehthumbs.db

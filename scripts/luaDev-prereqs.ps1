@@ -9,7 +9,7 @@
     - Installs Git, CMake, LLVM, Ninja, Python, Rust, Perl, direnv, git-cliff
     - Includes extra tools: Cppcheck, Clangd, LuaLS, 7-Zip, Make
     - Supports flags: --ci, --Minimal, --All, --DryRun
-    - Cleans up old logs (keeps last 5)
+    - Ensures log directory is visible in all applications
     - Verifies all tools after install
 #>
 
@@ -22,14 +22,44 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-# Set log folder and rotate logs
-$logDir = "$PSScriptRoot\logs"
-New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-$logFile = "$logDir\luaDev-prereqs-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
-Get-ChildItem -Path $logDir -Filter "luaDev-prereqs-*.log" |
-    Sort-Object CreationTime -Descending |
-    Select-Object -Skip 5 |
-    Remove-Item -Force -ErrorAction SilentlyContinue
+# --- Setup logs directory and fix visibility ---
+$rawLogDir = Join-Path $PSScriptRoot "logs"
+$logDir = (Resolve-Path -Path $rawLogDir -ErrorAction SilentlyContinue)?.Path
+
+if (-not $logDir) {
+    try {
+        $logDir = (New-Item -ItemType Directory -Force -Path $rawLogDir).FullName
+    } catch {
+        Write-Host "❌ Failed to create logs directory: $($_.Exception.Message)" -ForegroundColor Red
+        exit 1
+    }
+}
+
+# Normalize path
+$logDir = $logDir -replace '\\', '/'
+
+# Force remove Hidden/System attributes
+try {
+    $item = Get-Item -LiteralPath $logDir -Force
+    $item.Attributes = $item.Attributes -band (-bnot [System.IO.FileAttributes]::Hidden)
+    $item.Attributes = $item.Attributes -band (-bnot [System.IO.FileAttributes]::System)
+    Write-Host "✅ logs/ directory unhidden and ready" -ForegroundColor Green
+} catch {
+    Write-Host "⚠️ Could not reset logs/ attributes: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+# Clean previous log files
+try {
+    Get-ChildItem -Path "$logDir/*" -Recurse -Force -ErrorAction SilentlyContinue |
+        Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+    Write-Host "🧹 Cleaned logs/ content" -ForegroundColor DarkGray
+} catch {
+    Write-Host "⚠️ Failed to clean logs/: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+# --- Create timestamped log file ---
+$timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$logFile = "$logDir/luaDev-prereqs-$timestamp.log"
 
 function Write-Log {
     param (
@@ -37,14 +67,14 @@ function Write-Log {
         [string]$Color = "White",
         [switch]$NoNewLine
     )
-    $timestamp = "[$(Get-Date -Format u)]"
-    $logMessage = "$timestamp $Message"
+    $stamp = "[$(Get-Date -Format u)]"
+    $line = "$stamp $Message"
     if ($NoNewLine) {
         Write-Host $Message -ForegroundColor $Color -NoNewline
     } else {
         Write-Host $Message -ForegroundColor $Color
     }
-    $logMessage | Out-File -FilePath $logFile -Append -Encoding UTF8
+    $line | Out-File -FilePath $logFile -Append -Encoding UTF8
 }
 
 Write-Log "=== 🚀 luaDev Setup (Windows) ===" -Color Cyan
@@ -52,14 +82,7 @@ Write-Log "Log file: $logFile"
 Write-Log "CI Mode: $($ci.IsPresent)" -Color DarkGray
 Write-Log "Minimal: $($Minimal.IsPresent) | DryRun: $($DryRun.IsPresent)" -Color DarkGray
 
-function Assert-Winget {
-    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-        Write-Log "❌ WinGet is not available" -Color Red
-        Write-Log "ℹ️ Install from: https://aka.ms/winget-install" -Color Yellow
-        exit 1
-    }
-}
-
+# --- Tool Installer ---
 function Install-Tool {
     param (
         [string]$Command,
@@ -78,7 +101,7 @@ function Install-Tool {
     }
 
     Write-Log "⬇️ Installing ${Name} ($WingetId)..." -Color Yellow
-    $installResult = winget install --id=$WingetId -e --accept-package-agreements --accept-source-agreements 2>&1
+    $result = winget install --id=$WingetId -e --accept-package-agreements --accept-source-agreements 2>&1
 
     if ($LASTEXITCODE -eq 0) {
         Write-Log "✅ ${Name} installed successfully" -Color Green
@@ -86,18 +109,18 @@ function Install-Tool {
     }
 
     Write-Log "❌ ${Name} installation failed (Code: $LASTEXITCODE)" -Color Red
-    Write-Log "Error details: $installResult" -Color Red
+    Write-Log "Details: $result" -Color Red
     return $false
 }
 
 function Update-Environment {
-    Write-Log "🔄 Refreshing environment variables..." -Color DarkGray
+    Write-Log "🔄 Refreshing PATH variables..." -Color DarkGray
     $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" +
                 [System.Environment]::GetEnvironmentVariable("PATH","User") + ";" +
                 [System.Environment]::GetEnvironmentVariable("PATH","Process")
 }
 
-# Define tool groups
+# --- Tool Definitions ---
 $coreTools = @(
     @{Command = "git"; WingetId = "Git.Git"; Name = "Git"},
     @{Command = "cmake"; WingetId = "Kitware.CMake"; Name = "CMake"},
@@ -108,7 +131,7 @@ $coreTools = @(
     @{Command = "rustc"; WingetId = "Rustlang.Rustup"; Name = "Rust Toolchain"},
     @{Command = "perl"; WingetId = "StrawberryPerl.StrawberryPerl"; Name = "Perl"},
     @{Command = "direnv"; WingetId = "direnv.direnv"; Name = "direnv"},
-    @{Command = "git-cliff"; WingetId = "Orhun.git-cliff"; Name = "git-cliff"}
+    @{Command = "git-cliff"; WingetId = "orhun.git-cliff"; Name = "git-cliff"}
 )
 
 $extraTools = @(
@@ -126,11 +149,10 @@ $toolsToInstall = if ($All) {
     $coreTools
 }
 
-# Start installs
-Assert-Winget
+# --- Install Tools ---
 Write-Log "`n=== 🔧 Installing Tools ===" -Color Cyan
-
 $allSuccess = $true
+
 foreach ($tool in $toolsToInstall) {
     if (-not (Install-Tool @tool)) {
         $allSuccess = $false
@@ -138,7 +160,7 @@ foreach ($tool in $toolsToInstall) {
     }
 }
 
-# Rust setup
+# --- Rust Setup ---
 if ((Get-Command rustup -ErrorAction SilentlyContinue) -and -not $DryRun) {
     Write-Log "🦀 Configuring Rust toolchain..." -Color Gray
     rustup install stable | Out-File $logFile -Append
@@ -147,14 +169,13 @@ if ((Get-Command rustup -ErrorAction SilentlyContinue) -and -not $DryRun) {
 
 Update-Environment
 
-# Tool Verification
+# --- Verify Tools ---
 Write-Log "`n=== 🔍 Verifying Tools ===" -Color Cyan
 $verifyTools = $toolsToInstall | ForEach-Object {
     $cmd = $_.Command
     $args = "--version"
     if ($cmd -eq "perl") { $args = "-v" }
-    if ($cmd -eq "lua-language-server") { $args = "--version" }
-    if ($cmd -eq "7z") { $cmd = "7z"; $args = "" }
+    if ($cmd -eq "7z") { $args = "" }
     @{ Name = $_.Name; Command = $cmd; Arguments = $args }
 }
 
@@ -182,7 +203,7 @@ foreach ($tool in $verifyTools) {
     }
 }
 
-# Final Summary
+# --- Summary ---
 if ($DryRun) {
     Write-Log "`n[DryRun] Completed preview mode. No changes made." -Color Cyan
 } elseif ($allSuccess) {
@@ -192,8 +213,4 @@ if ($DryRun) {
     Write-Log "Review the log file: $logFile" -Color Yellow
 }
 
-$keptLogs = Get-ChildItem -Path $logDir -Filter "luaDev-prereqs-*.log" |
-    Sort-Object CreationTime -Descending |
-    Select-Object -First 5
-
-Write-Log "`n🗑️ Log cleanup complete — Kept $($keptLogs.Count) logs in $logDir" -Color DarkGray
+Write-Log "`n📝 Log policy: Only current session log preserved" -Color DarkGray

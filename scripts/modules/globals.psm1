@@ -1,39 +1,91 @@
 # globals.psm1
-# 🌍 Global path helpers for the luaDev project
+# 🌍 Global path and utility helpers for the luaDev project
 
 function Get-ProjectRoot {
-    <#
-    .SYNOPSIS
-        Returns the root of the luaDev project.
-    #>
-    return Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    return Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 }
 
-function Get-ArtifactPath {
+function Get-SourcesRoot {
+    $path = Join-Path (Get-ProjectRoot) "sources"
+    if (-not (Test-Path $path)) {
+        New-Item -Path $path -ItemType Directory -Force | Out-Null
+    }
+    return $path
+}
+
+function Get-ScriptsLogsRoot {
+    $path = Join-Path (Get-ProjectRoot) "logs"
+    if (-not (Test-Path $path)) {
+        New-Item -Path $path -ItemType Directory -Force | Out-Null
+    }
+    return $path
+}
+
+function Get-LogsBuildRoot {
+    $path = Join-Path (Get-ScriptsLogsRoot) "build"
+    if (-not (Test-Path $path)) {
+        New-Item -Path $path -ItemType Directory -Force | Out-Null
+    }
+    return $path
+}
+
+function Get-LogFilePathForTimestamp {
+    param(
+        [Parameter(Mandatory)][string]$Timestamp
+    )
+    return Join-Path (Join-Path (Get-LogsBuildRoot) $Timestamp) "build.log"
+}
+
+function Get-BuildOutputPaths {
     <#
     .SYNOPSIS
-        Returns the output path for built binaries.
-    .PARAMETER Engine
-        The engine name: lua or luajit
-    .PARAMETER Version
-        Full semantic version (e.g., 5.4.8)
-    .PARAMETER BuildType
-        static or shared
-    .PARAMETER Compiler
-        msvc, clang, mingw
-    .PARAMETER Create
-        If set, creates the directory if it doesn't exist
+        Returns paths to the log, markdown, and JSON outputs for a given timestamp.
+    .PARAMETER Timestamp
+        Timestamp string (e.g. 2025-07-02T21-00-00)
+    .OUTPUTS
+        Hashtable with keys: LogPath, MarkdownPath, JsonPath, OutputFolder
     #>
+    param(
+        [Parameter(Mandatory)][string]$Timestamp
+    )
+
+    $folder = Join-Path (Get-LogsBuildRoot) $Timestamp
+    return @{
+        OutputFolder = $folder
+        LogPath      = Join-Path $folder "build.log"
+        MarkdownPath = Join-Path $folder "build.md"
+        JsonPath     = Join-Path $folder "build.json"
+    }
+}
+
+function Get-BuildFolderName {
     param(
         [Parameter(Mandatory)][ValidateSet('lua','luajit')]$Engine,
         [Parameter(Mandatory)][string]$Version,
-        [Parameter(Mandatory)][string]$BuildType,
-        [Parameter(Mandatory)][string]$Compiler,
+        [Parameter(Mandatory)][ValidateSet("static", "shared")]$BuildType,
+        [Parameter(Mandatory)][ValidateSet("clang", "msvc", "mingw")]$Compiler
+    )
+
+    $arch = if (Get-Command Get-OSPlatform -ErrorAction SilentlyContinue) {
+        (Get-OSPlatform).Architecture
+    } else {
+        [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+    }
+
+    return "$Engine-$Version-$BuildType-$Compiler-$arch"
+}
+
+function Get-ArtifactPath {
+    param(
+        [Parameter(Mandatory)][ValidateSet('lua','luajit')]$Engine,
+        [Parameter(Mandatory)][string]$Version,
+        [Parameter(Mandatory)][ValidateSet("static", "shared")]$BuildType,
+        [Parameter(Mandatory)][ValidateSet("clang", "msvc", "mingw")]$Compiler,
         [switch]$Create
     )
 
-    $osInfo = Get-OSPlatform
-    $path = Join-Path (Get-ProjectRoot) "binaries" "${Engine}-${Version}-${BuildType}-${Compiler}-$($osInfo.Architecture)"
+    $folder = Get-BuildFolderName -Engine $Engine -Version $Version -BuildType $BuildType -Compiler $Compiler
+    $path = Join-Path (Get-ProjectRoot) "binaries" $folder
 
     if ($Create -and -not (Test-Path $path)) {
         New-Item -Path $path -ItemType Directory -Force | Out-Null
@@ -42,63 +94,56 @@ function Get-ArtifactPath {
     return $path
 }
 
-function Get-SourcesRoot {
-    <#
-    .SYNOPSIS
-        Returns the folder where Lua/LuaJIT sources are stored
-    #>
-    $path = Join-Path (Get-ProjectRoot) "sources"
-    if (-not (Test-Path $path)) {
-        New-Item $path -ItemType Directory -Force | Out-Null
-    }
-    return $path
-}
-
-function Get-ManifestsRoot {
-    <#
-    .SYNOPSIS
-        Returns the folder where build manifests (JSON/Markdown) are saved
-    #>
-    $path = Join-Path (Get-ProjectRoot) "manifests"
-    if (-not (Test-Path $path)) {
-        New-Item $path -ItemType Directory -Force | Out-Null
-    }
-    return $path
-}
-
-function Get-ScriptsLogsRoot {
-    <#
-    .SYNOPSIS
-        Returns the root logs/ directory (e.g., logs/setup, logs/build)
-    #>
-    $path = Join-Path (Get-ProjectRoot) "logs"
-    if (-not (Test-Path $path)) {
-        New-Item $path -ItemType Directory -Force | Out-Null
-    }
-    return $path
-}
-
 function Get-DocsRoot {
-    <#
-    .SYNOPSIS
-        Returns the root of the Docusaurus docs/ folder
-    #>
     return Join-Path (Get-ProjectRoot) "docs"
 }
 
+function Get-DocsVersionPath {
+    param(
+        [Parameter(Mandatory)][ValidateSet('lua','luajit')]$Engine,
+        [Parameter(Mandatory)][string]$Version
+    )
+
+    $engineDir = Join-Path (Get-DocsRoot) "builds"
+    $fullPath = Join-Path $engineDir $Engine
+    if (-not (Test-Path $fullPath)) {
+        New-Item -Path $fullPath -ItemType Directory -Force | Out-Null
+    }
+
+    return Join-Path $fullPath "$Version.md"
+}
+
+function Get-ManifestsRoot {
+    $path = Join-Path (Get-ProjectRoot) "manifests"
+    if (-not (Test-Path $path)) {
+        New-Item -Path $path -ItemType Directory -Force | Out-Null
+    }
+    return $path
+}
+
 function Get-TemplatesRoot {
-    <#
-    .SYNOPSIS
-        Returns the folder where CMake or config templates are stored
-    #>
     return Join-Path (Get-ProjectRoot) "templates"
+}
+
+function Get-SourcePath {
+    param(
+        [Parameter(Mandatory)][ValidateSet('lua','luajit')]$Engine,
+        [Parameter(Mandatory)][string]$Version
+    )
+    return Join-Path (Get-SourcesRoot) "$Engine-$Version"
 }
 
 Export-ModuleMember -Function `
     Get-ProjectRoot, `
-    Get-ArtifactPath, `
     Get-SourcesRoot, `
-    Get-ManifestsRoot, `
     Get-ScriptsLogsRoot, `
+    Get-LogsBuildRoot, `
+    Get-LogFilePathForTimestamp, `
+    Get-BuildOutputPaths, `
+    Get-BuildFolderName, `
+    Get-ArtifactPath, `
     Get-DocsRoot, `
-    Get-TemplatesRoot
+    Get-DocsVersionPath, `
+    Get-ManifestsRoot, `
+    Get-TemplatesRoot, `
+    Get-SourcePath

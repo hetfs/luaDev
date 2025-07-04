@@ -1,4 +1,6 @@
-# Source files (normalize line endings to LF)
+########################################################
+# 📄 Source Files — Normalize to LF line endings
+########################################################
 *.lua     text eol=lf
 *.ps1     text eol=lf
 *.psm1    text eol=lf
@@ -6,18 +8,24 @@
 *.json    text eol=lf
 *.md      text eol=lf
 
-# Treat logs and compiled binaries as binary
-*.log     binary
-*.luac    binary
-*.bak     binary
-*.tmp     binary
-*.cache   binary
-*.manifest.json binary
+########################################################
+# 🔒 Treat Logs, Binaries, and Caches as Binary
+########################################################
+*.log                binary
+*.luac               binary
+*.bak                binary
+*.tmp                binary
+*.cache              binary
+*.manifest.json      binary
 
-# Mark changelogs as generated
-CHANGELOG.md linguist-generated=true
-what-new.md  linguist-generated=true
+########################################################
+# 📝 Generated Changelogs
+########################################################
+CHANGELOG.md         linguist-generated=true
+what-new.md          linguist-generated=true
 
-# Ignore IDE metadata
-.vscode/* linguist-generated=true
-.idea/* linguist-generated=true
+########################################################
+# 🧠 IDE Metadata (ignore in language stats)
+########################################################
+.vscode/*            linguist-generated=true
+.idea/*              linguist-generated=true

@@ -28,16 +28,32 @@ luaBinary/
 #############################################
 # 📝 Logs & Generated Files
 #############################################
-scripts/logs/
 *.log
 *.bak
 *.tmp
 *.cache
 *.md.tmp
 *.manifest.json
-/scripts/logs/
+
+# Only ignore log files inside logs folders — not the folders themselves
+scripts/logs/*.log
+scripts/logs/**/*.log
+scripts/logs/*.md
+scripts/logs/**/*.md
+scripts/logs/*.json
+scripts/logs/**/*.json
+
+# Keep logs folder structure intact with .gitkeep
+!scripts/logs/.gitkeep
+
+# Ignore source cache
 /scripts/sources/
-/LuaBinaries/
+# Optional: Allow keeping a readme or config in sources
+!/scripts/sources/.gitkeep
+
+# Ignore build artifacts globally (but not folders)
+**/*.tmp
+**/*.manifest.json
 
 #############################################
 # 🧪 Test & Coverage
@@ -81,4 +97,3 @@ ehthumbs.db
 desktop.ini
 *.swp
 *.swo
-/logs/

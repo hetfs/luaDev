@@ -1,7 +1,7 @@
 # logging.psm1
-# 🪵 Unified logging module for luaDev
-# Provides color-coded and level-aware logging functions for all CLI scripts.
+# 🪵 Centralized logging for luaDev — supports color, verbosity, and easy integration.
 
+# Define log level table
 $script:LogLevels = @{
     Silent  = 0
     Error   = 1
@@ -11,6 +11,7 @@ $script:LogLevels = @{
     Debug   = 5
 }
 
+# Default to Info unless overridden later
 $script:CurrentLogLevel = $script:LogLevels["Info"]
 
 function Set-LogLevel {
@@ -20,7 +21,8 @@ function Set-LogLevel {
     .PARAMETER Level
         One of: Silent, Error, Warn, Info, Verbose, Debug
     #>
-    param(
+    param (
+        [Parameter(Mandatory)]
         [ValidateSet("Silent", "Error", "Warn", "Info", "Verbose", "Debug")]
         [string]$Level
     )
@@ -30,41 +32,41 @@ function Set-LogLevel {
 function Get-LogLevel {
     <#
     .SYNOPSIS
-        Returns the current logging level as string.
+        Returns the current logging level name (e.g., Info)
     #>
     return ($script:LogLevels.Keys | Where-Object { $script:LogLevels[$_] -eq $script:CurrentLogLevel })
 }
 
 function Write-InfoLog {
-    param([string]$Message)
+    param ([string]$Message)
     if ($script:CurrentLogLevel -ge $script:LogLevels["Info"]) {
         Write-Host "[INFO] $Message" -ForegroundColor Cyan
     }
 }
 
-function Write-ErrorLog {
-    param([string]$Message)
-    if ($script:CurrentLogLevel -ge $script:LogLevels["Error"]) {
-        Write-Host "[ERROR] $Message" -ForegroundColor Red
-    }
-}
-
 function Write-WarningLog {
-    param([string]$Message)
+    param ([string]$Message)
     if ($script:CurrentLogLevel -ge $script:LogLevels["Warn"]) {
         Write-Host "[WARN] $Message" -ForegroundColor Yellow
     }
 }
 
+function Write-ErrorLog {
+    param ([string]$Message)
+    if ($script:CurrentLogLevel -ge $script:LogLevels["Error"]) {
+        Write-Host "[ERROR] $Message" -ForegroundColor Red
+    }
+}
+
 function Write-VerboseLog {
-    param([string]$Message)
+    param ([string]$Message)
     if ($script:CurrentLogLevel -ge $script:LogLevels["Verbose"]) {
         Write-Host "[VERBOSE] $Message" -ForegroundColor Gray
     }
 }
 
 function Write-DebugLog {
-    param([string]$Message)
+    param ([string]$Message)
     if ($script:CurrentLogLevel -ge $script:LogLevels["Debug"]) {
         Write-Host "[DEBUG] $Message" -ForegroundColor DarkGray
     }
@@ -74,7 +76,7 @@ Export-ModuleMember -Function `
     Set-LogLevel, `
     Get-LogLevel, `
     Write-InfoLog, `
-    Write-ErrorLog, `
     Write-WarningLog, `
+    Write-ErrorLog, `
     Write-VerboseLog, `
     Write-DebugLog

@@ -1,25 +1,63 @@
 # https://EditorConfig.org
-# top-most EditorConfig file
-
+# Top-most EditorConfig file
 root = true
 
+########################################################
+# 🌍 Default Rules for All Files
+########################################################
 [*]
 end_of_line = lf
 charset = utf-8
-
-indent_size = 4
 indent_style = space
-
+indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 max_line_length = 140
 
+########################################################
+# 📄 Markdown — Allow trailing spaces and long lines
+########################################################
 [*.md]
 trim_trailing_whitespace = false
-max_line_length = unset
+max_line_length = off  # 'unset' is deprecated in some editors
 
-[gradle/verification-metadata.xml]
-indent_size = 3
+########################################################
+# ⚙️ JSON, YAML, and Configs — Common Overrides
+########################################################
+[*.json]
+indent_size = 2
+max_line_length = 120
 
 [*.yml]
+indent_size = 2
 ij_yaml_spaces_within_brackets = false
+
+[*.yaml]
+indent_size = 2
+
+########################################################
+# 💡 Lua Files
+########################################################
+[*.lua]
+indent_size = 4
+
+########################################################
+# 🛠 PowerShell Files
+########################################################
+[*.ps1]
+indent_size = 4
+
+[*.psm1]
+indent_size = 4
+
+########################################################
+# 🐚 Shell Scripts
+########################################################
+[*.sh]
+indent_size = 4
+
+########################################################
+# 📁 Specific File Overrides
+########################################################
+[gradle/verification-metadata.xml]
+indent_size = 3
