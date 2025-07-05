@@ -238,7 +238,7 @@ $($LogLines -join "`n")
     $content | Set-Content -Path $MarkdownPath
 }
 function global:Export-LuaBuildManifest { param($Artifacts) }
-function global:Export-BuildLogsToDocs { param($Force) }
+function global:Export-BuildLogsToDocs { param([switch]$Force) }
 function global:Get-LatestEngineVersions {
     param($Engine)
     return $Engine -eq 'lua' ?
@@ -254,13 +254,14 @@ function global:Build-LuaEngine {
     return $true
 }
 
-# Dynamic module loading
+# Dynamic module loading with verbose/debug passthrough
 try {
     $loaderPath = Join-Path $ModulesPath "loader.psm1"
     if (Test-Path $loaderPath) {
         Import-Module $loaderPath -Force -DisableNameChecking
         if (Get-Command Import-LuaDevModules -ErrorAction SilentlyContinue) {
-            Import-LuaDevModules -ModulesPath $ModulesPath
+            # ✅ Forward -Verbose and -Debug from buildLua.ps1
+            Import-LuaDevModules -ModulesPath $ModulesPath -Verbose:$VerbosePreference -Debug:$DebugPreference
         }
     }
     else {
@@ -270,6 +271,17 @@ try {
 catch {
     Write-WarningLog "⚠️ Module loader exception: $($_.Exception.Message)"
 }
+
+# Optional: Debug visibility for module load results
+if ($LogLevel -eq "Debug") {
+    $loadedModulesVar = Get-Variable -Scope Global -Name "loadedModules" -ErrorAction SilentlyContinue
+    if ($loadedModulesVar) {
+        Write-DebugLog "Modules loaded: $($loadedModulesVar.Value -join ', ')"
+    } else {
+        Write-DebugLog "No loadedModules variable detected (maybe fallback mode skipped tracking)"
+    }
+}
+
 
 # Apply log level if supported
 if (Get-Command Set-LogLevel -ErrorAction SilentlyContinue) {
