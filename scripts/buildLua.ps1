@@ -1,38 +1,45 @@
 <#
 .SYNOPSIS
-    Cross-platform Lua/LuaJIT build automation script.
+    Enterprise-grade Lua/LuaJIT build automation solution
 .DESCRIPTION
-    Downloads and builds Lua 5.1–5.4 and LuaJIT using Clang, MSVC, or MinGW via CMake.
+    Cross-platform build system for Lua (5.1-5.4) and LuaJIT (2.0.5+) with
+    support for Clang, MSVC, and MinGW compilers. Features dry-run simulation
+    and comprehensive artifact generation.
 .PARAMETER EngineVersions
-    Specific versions to build (e.g., 5.4.6, 2.1.0).
+    Specific versions to build (e.g., 5.4.8, 2.1.0)
 .PARAMETER Engines
-    Engines to build: lua or luajit.
+    Engines to build: lua and/or luajit (default: both)
 .PARAMETER BuildType
-    Build configuration: static or shared.
+    Build configuration: static or shared (default: static)
 .PARAMETER Compiler
-    Compiler toolchain: clang, msvc, mingw.
+    Compiler toolchain: clang, msvc, mingw (default: clang)
 .PARAMETER LogLevel
-    Verbosity level: Silent, Error, Warn, Info, Verbose, Debug.
+    Verbosity: Silent, Error, Warn, Info, Verbose, Debug (default: Info)
 .PARAMETER Clean
-    Cleans logs and binaries before building.
-.PARAMETER MaxParallelJobs
-    Max parallel builds (defaults to CPU count).
+    Purge logs and binaries before building
 .PARAMETER DryRun
-    Simulate build steps without executing them.
-.PARAMETER Parallel
-    Enable parallel builds across targets.
+    Simulate build without execution
+.EXAMPLE
+    # Dry-run all engines
+    .\buildLua.ps1 -DryRun
+.EXAMPLE
+    # Build specific versions
+    .\buildLua.ps1 -V 5.4.8,2.1.0
+.EXAMPLE
+    # Clean artifacts and build LuaJIT only
+    .\buildLua.ps1 -Clean -Engines luajit
 #>
 
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess = $true)]
 param (
-    [Parameter(Position=0, ValueFromRemainingArguments=$true)]
+    [Parameter(Position = 0, ValueFromRemainingArguments = $true)]
     [string[]]$RemainingArgs,
 
     [Alias("Versions", "V")]
     [string[]]$EngineVersions = @(),
 
     [ValidateSet("lua", "luajit")]
-    [string[]]$Engines = @("lua"),
+    [string[]]$Engines = @("lua", "luajit"),
 
     [ValidateSet("static", "shared")]
     [string]$BuildType = "static",
@@ -43,239 +50,399 @@ param (
     [ValidateSet("Silent", "Error", "Warn", "Info", "Verbose", "Debug")]
     [string]$LogLevel = "Info",
 
-    [int]$MaxParallelJobs = [Environment]::ProcessorCount,
     [switch]$Clean,
-    [switch]$DryRun,
-    [switch]$Parallel
+    [switch]$DryRun
 )
 
-# --- Region: CLI Helpers ---
+#region Logging Setup
+$ErrorActionPreference = "Stop"
+
+# --- Setup logs directory and fix visibility ---
+$rawLogDir = Join-Path $PSScriptRoot "logs"
+$logDir = (Resolve-Path -Path $rawLogDir -ErrorAction SilentlyContinue)?.Path
+
+if (-not $logDir) {
+    try {
+        $logDir = (New-Item -ItemType Directory -Force -Path $rawLogDir).FullName
+    } catch {
+        Write-Host "❌ Failed to create logs directory: $($_.Exception.Message)" -ForegroundColor Red
+        exit 1
+    }
+}
+
+# Normalize path
+$logDir = $logDir -replace '\\', '/'
+
+# Force remove Hidden/System attributes
+try {
+    $item = Get-Item -LiteralPath $logDir -Force
+    $item.Attributes = $item.Attributes -band (-bnot [System.IO.FileAttributes]::Hidden)
+    $item.Attributes = $item.Attributes -band (-bnot [System.IO.FileAttributes]::System)
+} catch {
+    Write-Host "⚠️ Could not reset logs/ attributes: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+# Clean previous log files
+try {
+    Get-ChildItem -Path "$logDir/*" -Recurse -Force -ErrorAction SilentlyContinue |
+        Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+} catch {
+    Write-Host "⚠️ Failed to clean logs/: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+# --- Create timestamped log file ---
+$timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$logFile = "$logDir/buildLua-$timestamp.log"
+
+function Write-Log {
+    param (
+        [string]$Message,
+        [string]$Color = "White",
+        [switch]$NoNewLine
+    )
+    $stamp = "[$(Get-Date -Format u)]"
+    $line = "$stamp $Message"
+    if ($NoNewLine) {
+        Write-Host $Message -ForegroundColor $Color -NoNewline
+    } else {
+        Write-Host $Message -ForegroundColor $Color
+    }
+    $line | Out-File -FilePath $logFile -Append -Encoding UTF8
+}
+
+# Wrapper functions for different log levels
+function Write-InfoLog($msg) {
+    if ($LogLevel -in "Info", "Verbose", "Debug") {
+        Write-Log -Message "[INFO] $msg" -Color Cyan
+    } else {
+        # Log to file only
+        $stamp = "[$(Get-Date -Format u)]"
+        "$stamp [INFO] $msg" | Out-File -FilePath $logFile -Append -Encoding UTF8
+    }
+}
+
+function Write-WarningLog($msg) {
+    if ($LogLevel -in "Warn", "Info", "Verbose", "Debug") {
+        Write-Log -Message "[WARN] $msg" -Color Yellow
+    } else {
+        $stamp = "[$(Get-Date -Format u)]"
+        "$stamp [WARN] $msg" | Out-File -FilePath $logFile -Append -Encoding UTF8
+    }
+}
+
+function Write-ErrorLog($msg) {
+    if ($LogLevel -ne "Silent") {
+        Write-Log -Message "[ERROR] $msg" -Color Red
+    } else {
+        $stamp = "[$(Get-Date -Format u)]"
+        "$stamp [ERROR] $msg" | Out-File -FilePath $logFile -Append -Encoding UTF8
+    }
+}
+
+function Write-VerboseLog($msg) {
+    if ($LogLevel -in "Verbose", "Debug") {
+        Write-Log -Message "[VERBOSE] $msg" -Color DarkGray
+    } else {
+        $stamp = "[$(Get-Date -Format u)]"
+        "$stamp [VERBOSE] $msg" | Out-File -FilePath $logFile -Append -Encoding UTF8
+    }
+}
+
+function Write-DebugLog($msg) {
+    if ($LogLevel -eq "Debug") {
+        Write-Log -Message "[DEBUG] $msg" -Color DarkMagenta
+    } else {
+        $stamp = "[$(Get-Date -Format u)]"
+        "$stamp [DEBUG] $msg" | Out-File -FilePath $logFile -Append -Encoding UTF8
+    }
+}
+
+Write-Log "=== 🚀 LuaDev Build System ===" -Color Cyan
+Write-Log "Log file: $logFile"
+Write-Log "Script version: 1.0.0" -Color DarkGray
+#endregion
+
+#region Initialization
+$SCRIPT_VERSION = "1.0.0"
+$startTime = Get-Date
 $showHelp = $false
 $showVersion = $false
 
+# Parse legacy arguments
 foreach ($arg in $RemainingArgs) {
     switch ($arg) {
-        { $_ -in '-h', '--help', '-?', '/?' } { $showHelp = $true; continue }
-        { $_ -in '-v', '--version' } { $showVersion = $true; continue }
-        { $_ -in '-V', '--V' } {
-            if (-not $EngineVersions) {
-                Write-Host "❗ -V requires one or more version numbers. Use -v for version info." -ForegroundColor Red
-                exit 1
-            }
-        }
+        { $_ -in '-h', '-?', '--help', '/?' } { $showHelp = $true }
+        { $_ -in '-v', '--version' } { $showVersion = $true }
     }
 }
 
 if ($showVersion) {
-    Write-Host "luaDev Build System v1.0.0" -ForegroundColor Green
+    Write-Log "luaDev Build System v$SCRIPT_VERSION" -Color Green
     exit 0
 }
 
 if ($showHelp) {
-    Write-Host @"
-luaDev Build System v1.0.0
------------------------------------------------
-USAGE:
-  .\buildLua.ps1
-    [-EngineVersions <ver1,ver2,...>]
-    [-Engines {lua,luajit}]
-    [-BuildType {static,shared}]
-    [-Compiler {clang,mingw,msvc}]
-    [-LogLevel {Silent,Error,Warn,Info,Verbose,Debug}]
-    [-MaxParallelJobs <int>]
-    [-Clean] [-DryRun] [-Parallel]
-
-ALIASES:
-  -h, --help        Show this help message
-  -v, --version     Show build system version
-  -V, --Versions    Alias for -EngineVersions
-"@
+    Get-Help $MyInvocation.MyCommand.Definition -Detailed | Out-String | Write-Log
     exit 0
 }
 
-# --- Region: Init ---
 $ScriptRoot = $PSScriptRoot
-$ModulesPath = Join-Path $ScriptRoot "modules"
-$timestamp = Get-Date -Format "yyyy-MM-ddTHH-mm-ss"
-$logFolder = Join-Path $ScriptRoot "..\logs\build\$timestamp"
-$logPath = Join-Path $logFolder "build.log"
+#endregion
 
-New-Item -ItemType Directory -Force -Path $logFolder | Out-Null
-Start-Transcript -Path $logPath -Append | Out-Null
-
-# --- Logging Helpers ---
-function Write-InfoLog { param($msg) if ($LogLevel -in "Info","Verbose","Debug") { Write-Host "[INFO] $msg" -ForegroundColor Cyan } }
-function Write-WarningLog { param($msg) if ($LogLevel -in "Warn","Info","Verbose","Debug") { Write-Host "[WARN] $msg" -ForegroundColor Yellow } }
-function Write-ErrorLog { param($msg) if ($LogLevel -ne "Silent") { Write-Host "[ERROR] $msg" -ForegroundColor Red } }
-function Write-VerboseLog { param($msg) if ($LogLevel -in "Verbose","Debug") { Write-Host "[VERBOSE] $msg" -ForegroundColor DarkGray } }
-
-# --- Region: Clean ---
+#region Clean Operation
 if ($Clean) {
-    foreach ($folder in @("logs\build", "LuaBinaries")) {
-        $path = Join-Path $ScriptRoot "..\$folder"
+    Write-InfoLog "🚮 Initializing clean operation..."
+    $pathsToClean = @(
+        (Join-Path $ScriptRoot ".." "LuaBinaries")
+    )
+
+    foreach ($path in $pathsToClean) {
         if (Test-Path $path) {
             try {
-                Remove-Item -Recurse -Force $path -ErrorAction Stop
-                Write-InfoLog "🧹 Cleaned: $path"
-            } catch {
-                Write-ErrorLog "❌ Failed to clean $folder: $(${_.Exception.Message})"
+                if ($PSCmdlet.ShouldProcess($path, "Remove directory")) {
+                    Remove-Item -Recurse -Force $path -ErrorAction Stop
+                    Write-InfoLog "🧹 Successfully cleaned: $path"
+                }
             }
+            catch {
+                Write-ErrorLog "❌ Clean failed for $path : $($_.Exception.Message)"
+            }
+        }
+        else {
+            Write-VerboseLog "Skipping clean (path not found): $path"
         }
     }
 }
+#endregion
 
-# --- Region: Stub Functions (Override via Modules) ---
-function global:Get-BuildSystemVersion { "1.0.0" }
-function global:Set-LogLevel { param($Level) }
-function global:Test-IsSupportedVersion { $true }
+#region Module System
+$ModulesPath = Join-Path $ScriptRoot "modules"
+
+# Default implementations (overridden by modules)
+function global:Get-BuildSystemVersion { $SCRIPT_VERSION }
+function global:Set-LogLevel { param($Level) $script:LogLevel = $Level }
+function global:Test-IsSupportedVersion { param($Engine, $Version) $true }
 function global:Get-OSPlatform {
     return @{
         Platform = if ($IsWindows) { "Windows" } elseif ($IsLinux) { "Linux" } elseif ($IsMacOS) { "macOS" } else { "Unknown" }
-        Architecture = $env:PROCESSOR_ARCHITECTURE ?? [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+        Architecture = if ($IsWindows) { $env:PROCESSOR_ARCHITECTURE } else { (uname -m) }
     }
 }
-function global:Export-LogAsMarkdown { param($MarkdownPath, $LogLines, $Title) }
+function global:Export-LogAsMarkdown {
+    param($MarkdownPath, $LogLines, $Title)
+    $content =
+"# $Title
+````log
+$($LogLines -join "`n")
+````"
+    $content | Set-Content -Path $MarkdownPath
+}
 function global:Export-LuaBuildManifest { param($Artifacts) }
 function global:Export-BuildLogsToDocs { param($Force) }
 function global:Get-LatestEngineVersions {
     param($Engine)
-    if ($Engine -eq 'lua') { @('5.4.8', '5.3.6', '5.2.4', '5.1.5') }
-    else { @('2.1.0-beta3', '2.0.5') }
+    return $Engine -eq 'lua' ?
+        @('5.4.8', '5.3.6', '5.2.4', '5.1.5') :
+        @('2.1.0-beta3', '2.0.5')
 }
 function global:Get-SourcePath {
     param($Engine, $Version)
-    Join-Path $PSScriptRoot "..\sources\$Engine-$Version"
+    Join-Path $ScriptRoot ".." "sources" "$Engine-$Version"
 }
-function global:Build-LuaEngine { $true }
+function global:Build-LuaEngine {
+    param($Engine, $Version, $SourcePath, $BuildType, $Compiler)
+    return $true
+}
 
-# --- Region: Load Modules ---
+# Dynamic module loading
 try {
-    Import-Module (Join-Path $ModulesPath "loader.psm1") -Force -DisableNameChecking -ErrorAction Stop
-    Import-LuaDevModules -ModulesPath $ModulesPath -ErrorAction Stop
-} catch {
-    Write-WarningLog "⚠️ Module loading failed: $(${_.Exception.Message})"
+    $loaderPath = Join-Path $ModulesPath "loader.psm1"
+    if (Test-Path $loaderPath) {
+        Import-Module $loaderPath -Force -DisableNameChecking
+        if (Get-Command Import-LuaDevModules -ErrorAction SilentlyContinue) {
+            Import-LuaDevModules -ModulesPath $ModulesPath
+        }
+    }
+    else {
+        Write-VerboseLog "Module loader not found: $loaderPath"
+    }
+}
+catch {
+    Write-WarningLog "⚠️ Module loader exception: $($_.Exception.Message)"
 }
 
+# Apply log level if supported
 if (Get-Command Set-LogLevel -ErrorAction SilentlyContinue) {
     Set-LogLevel -Level $LogLevel
 }
+#endregion
 
-# --- Region: Build Plan ---
-Write-InfoLog "🚀 Starting Build @ $timestamp"
-Write-InfoLog "⚙️ Config: Type=$BuildType, Compiler=$Compiler, DryRun=$DryRun, Parallel=$Parallel, Jobs=$MaxParallelJobs"
+#region Build Planning
+Write-InfoLog "🚀 Initiating build process"
+Write-InfoLog "⚙️ Configuration:"
+Write-InfoLog "  - Build Type: $BuildType"
+Write-InfoLog "  - Compiler: $Compiler"
+Write-InfoLog "  - Dry Run: $($DryRun.IsPresent)"
 
-$defaultVersions = @{ lua = @("5.4.6", "5.3.6", "5.2.4", "5.1.5"); luajit = @("2.1.0-beta3", "2.0.5") }
-$Engines = $Engines | ForEach-Object { $_.ToLower() } | Select-Object -Unique
+$osInfo = Get-OSPlatform
+Write-InfoLog "🌐 Platform: $($osInfo.Platform) ($($osInfo.Architecture))"
+
 $BuildTargets = [System.Collections.Generic.List[hashtable]]::new()
+$Engines = $Engines | Select-Object -Unique
 
+# Resolve target versions
 foreach ($engine in $Engines) {
     $versions = if ($EngineVersions) {
-        $EngineVersions | Where-Object { $_ -match $(if ($engine -eq "lua") { "^5\." } else { "^2\." }) }
-    } else {
+        # Filter by engine-specific version patterns
+        $pattern = if ($engine -eq 'lua') { '^5\.\d+\.\d+' } else { '^2\.\d+\.\d+' }
+        $EngineVersions | Where-Object { $_ -match $pattern }
+    }
+    else {
         Get-LatestEngineVersions -Engine $engine
+    }
+
+    if (-not $versions) {
+        Write-WarningLog "⚠️ No versions resolved for engine: $engine"
+        continue
     }
 
     foreach ($version in $versions) {
         if (Test-IsSupportedVersion -Engine $engine -Version $version) {
-            $BuildTargets.Add(@{ Engine = $engine; Version = $version })
-            Write-VerboseLog "🎯 Target queued: $engine $version"
-        } else {
-            Write-WarningLog "⚠️ Unsupported: $engine $version"
+            $BuildTargets.Add(@{
+                Engine = $engine
+                Version = $version
+            })
+            Write-VerboseLog "🎯 Target registered: $engine/$version"
+        }
+        else {
+            Write-WarningLog "⚠️ Unsupported version: $engine/$version"
         }
     }
 }
 
-if (-not $BuildTargets.Count) {
-    Write-ErrorLog "❌ No valid targets found"
+# Validate targets
+if ($BuildTargets.Count -eq 0) {
+    Write-ErrorLog "❌ Critical: No valid build targets found"
     exit 1
 }
 
-# --- Region: Build Execution ---
-$osInfo = Get-OSPlatform
-$startTime = Get-Date
+Write-InfoLog "🎯 Build targets: $($BuildTargets.Count)"
+$BuildTargets | ForEach-Object {
+    Write-VerboseLog "    - $($_.Engine) $($_.Version)"
+}
+#endregion
+
+#region Build Execution
 $Artifacts = @()
 
 function InvokeBuildTarget {
-    param ($target, $osInfo, $DryRun)
+    param($target, $osInfo, $DryRun)
 
     $meta = @{
-        Engine      = $target.Engine
-        Version     = $target.Version
-        Compiler    = $Compiler
-        BuildType   = $BuildType
-        Platform    = $osInfo.Platform
+        Engine = $target.Engine
+        Version = $target.Version
+        Compiler = $Compiler
+        BuildType = $BuildType
+        Platform = $osInfo.Platform
         Architecture = $osInfo.Architecture
-        BuildTime   = [DateTime]::UtcNow
-        Success     = $false
+        BuildStart = [DateTime]::UtcNow
+        BuildEnd = $null
+        Success = $false
+        Duration = $null
     }
 
     try {
-        $src = Get-SourcePath -Engine $meta.Engine -Version $meta.Version
-        if (-not (Test-Path $src)) { throw "Source not found: $src" }
-
         if ($DryRun) {
-            Write-InfoLog "[DRYRUN] Would build $($meta.Engine) $($meta.Version)"
+            Write-InfoLog "[DRYRUN] Build simulation: $($meta.Engine)/$($meta.Version)"
             $meta.Success = $true
-        } else {
-            $meta.Success = Build-LuaEngine -Engine $meta.Engine -Version $meta.Version -SourcePath $src -BuildType $BuildType -Compiler $Compiler
         }
-    } catch {
+        else {
+            $src = Get-SourcePath -Engine $meta.Engine -Version $meta.Version
+            if (-not (Test-Path $src)) {
+                throw "Source directory missing: $src"
+            }
+
+            $buildStart = Get-Date
+            $meta.Success = Build-LuaEngine @meta -SourcePath $src
+            $meta.Duration = [Math]::Round(((Get-Date) - $buildStart).TotalSeconds, 2)
+        }
+    }
+    catch {
         $meta.Error = $_.Exception.Message
-        Write-ErrorLog "❌ Build failed: $($meta.Engine) $($meta.Version) — $($meta.Error)"
+        Write-ErrorLog "❌ Build failure: $($meta.Engine)/$($meta.Version) - $($meta.Error)"
+    }
+    finally {
+        $meta.BuildEnd = [DateTime]::UtcNow
     }
 
     return $meta
 }
 
-if ($Parallel) {
-    $jobs = @()
-    $sem = [System.Threading.SemaphoreSlim]::new($MaxParallelJobs)
-
+try {
+    Write-InfoLog "🔨 Sequential build mode activated"
     foreach ($target in $BuildTargets) {
-        $sem.Wait()
-        $jobs += Start-ThreadJob -Name "$($target.Engine)-$($target.Version)" -ScriptBlock {
-            param($target, $ModulesPath, $BuildType, $Compiler, $DryRun, $osInfo)
-            try {
-                Import-Module "$using:ModulesPath\loader.psm1" -Force
-                Import-LuaDevModules -ModulesPath "$using:ModulesPath"
-            } catch {}
-            InvokeBuildTarget -target $target -osInfo $osInfo -DryRun:$DryRun
-        } -ArgumentList $target, $ModulesPath, $BuildType, $Compiler, $DryRun, $osInfo
+        $Artifacts += InvokeBuildTarget -target $target -osInfo $osInfo -DryRun:$DryRun.IsPresent
+    }
+}
+catch {
+    Write-ErrorLog "🔥 Critical build error: $($_.Exception.Message)"
+    exit 2
+}
+#endregion
+
+#region Post-Build Processing
+$successCount = ($Artifacts | Where-Object { $_.Success }).Count
+$failureCount = $Artifacts.Count - $successCount
+$totalDuration = [Math]::Round(((Get-Date) - $startTime).TotalMinutes, 2)
+
+# Generate artifacts
+try {
+    # Markdown report
+    $lines = Get-Content $logFile -ErrorAction SilentlyContinue
+    if ($lines) {
+        $mdPath = $logFile.Replace('.log', '.md')
+        Export-LogAsMarkdown -MarkdownPath $mdPath -LogLines $lines -Title "Build Report - $timestamp"
+        Write-InfoLog "📝 Generated Markdown report: $mdPath"
     }
 
-    $Artifacts += ($jobs | Wait-Job | ForEach-Object { Receive-Job $_; Remove-Job $_ })
+    # JSON log
+    $jsonPath = $logFile.Replace('.log', '.json')
+    $Artifacts | ConvertTo-Json -Depth 6 | Set-Content -Path $jsonPath -Encoding UTF8
+    Write-InfoLog "📄 Generated JSON log: $jsonPath"
+
+    # Manifest and docs
+    if ($successCount -gt 0) {
+        Export-LuaBuildManifest -Artifacts $Artifacts
+        Export-BuildLogsToDocs -Force
+        Write-InfoLog "📦 Published artifacts to documentation system"
+    }
+}
+catch {
+    Write-ErrorLog "❌ Artifact generation failed: $($_.Exception.Message)"
+}
+
+# Build summary
+Write-Log ""
+Write-Log "=== BUILD SUMMARY ===" -Color Magenta
+Write-Log "🕒 Total Duration: $totalDuration minutes" -Color Cyan
+Write-Log "✅ Successes: $successCount" -Color Green
+if ($failureCount -gt 0) {
+    Write-Log "❌ Failures: $failureCount" -Color Red
 } else {
-    foreach ($target in $BuildTargets) {
-        $Artifacts += InvokeBuildTarget -target $target -osInfo $osInfo -DryRun:$DryRun
-    }
+    Write-Log "❌ Failures: $failureCount" -Color Gray
 }
+Write-Log ""
 
-# --- Region: Export ---
-$lines = Get-Content $logPath -ErrorAction SilentlyContinue
-if ($lines) {
-    Export-LogAsMarkdown -MarkdownPath (Join-Path $logFolder "build.md") -LogLines $lines -Title "Build Report - $timestamp"
-}
-
-$Artifacts | ConvertTo-Json -Depth 6 | Set-Content -Path (Join-Path $logFolder "build.json") -Encoding UTF8
-
-$success = ($Artifacts | Where-Object { $_.Success }).Count
-$fail = $Artifacts.Count - $success
-$duration = [Math]::Round(((Get-Date) - $startTime).TotalMinutes, 2)
-
-if ($success -gt 0) {
-    Export-LuaBuildManifest -Artifacts $Artifacts
-    Export-BuildLogsToDocs -Force
-    Write-InfoLog "📦 Logs & Manifest pushed to docs/dev/logs"
-}
-
-Write-InfoLog "🏁 Build complete: ${duration}m | ✅ $success | ❌ $fail"
 $Artifacts | ForEach-Object {
-    $s = if ($_.Success) { "✅" } else { "❌" }
-    Write-Host "$s [$($_.Engine)] $($_.Version) ($($_.BuildType)/$($_.Compiler))" -ForegroundColor Gray
+    $status = if ($_.Success) { "✅" } else { "❌" }
+    $color = if ($_.Success) { "Green" } else { "Red" }
+    $durationInfo = if ($_.Duration) { "in ${$_.Duration}s" } else { "" }
+    Write-Log "$status [$($_.Engine)] $($_.Version) ($($_.BuildType)/$($_.Compiler)) $durationInfo" -Color $color
 }
 
-exit ($fail -eq 0 ? 0 : 1)
+Write-Log ""
+Write-Log "📝 Log policy: Only current session log preserved" -Color DarkGray
+Write-Log "Logs available at: $logDir" -Color Cyan
+#endregion
 
-} finally {
-    Stop-Transcript | Out-Null
-}
+exit ($failureCount -eq 0 ? 0 : 1)
