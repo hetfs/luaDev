@@ -36,8 +36,12 @@ function Import-LuaDevModules {
         $fullPath = Join-Path $ModulesPath $module
         if (Test-Path $fullPath) {
             try {
-                Import-Module -Name $fullPath -Force -DisableNameChecking -ErrorAction Stop
-                Write-Verbose "[loader] ✅ Loaded: $module"
+                if ($module -ne 'loader.psm1') {
+                    Import-Module -Name $fullPath -Force -DisableNameChecking -ErrorAction Stop
+                    Write-Verbose "[loader] ✅ Loaded: $module"
+                } else {
+                    Write-Verbose "[loader] ♻️ Skipping loader self-import"
+                }
                 $loadedModules += $module
             } catch {
                 Write-Warning "[loader] ⚠️ Failed to load $module — $($_.Exception.Message)"

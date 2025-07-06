@@ -2,9 +2,9 @@
 .SYNOPSIS
     Enterprise-grade Lua/LuaJIT build automation solution
 .DESCRIPTION
-    Cross-platform build system for Lua (5.1-5.4) and LuaJIT (2.0.5+) with
-    support for Clang, MSVC, and MinGW compilers. Features dry-run simulation
-    and comprehensive artifact generation.
+    Cross-platform build system for Lua (5.1–5.4) and LuaJIT (2.0.5+) with
+    support for Clang, MSVC, and MinGW compilers. Features dry-run simulation,
+    automatic source fetching, and structured artifact generation.
 .PARAMETER EngineVersions
     Specific versions to build (e.g., 5.4.8, 2.1.0)
 .PARAMETER Engines
@@ -20,13 +20,10 @@
 .PARAMETER DryRun
     Simulate build without execution
 .EXAMPLE
-    # Dry-run all engines
     .\buildLua.ps1 -DryRun
 .EXAMPLE
-    # Build specific versions
     .\buildLua.ps1 -V 5.4.8,2.1.0
 .EXAMPLE
-    # Clean artifacts and build LuaJIT only
     .\buildLua.ps1 -Clean -Engines luajit
 #>
 
@@ -369,10 +366,21 @@ function InvokeBuildTarget {
             $meta.Success = $true
         }
         else {
-            $src = Get-SourcePath -Engine $meta.Engine -Version $meta.Version
-            if (-not (Test-Path $src)) {
-                throw "Source directory missing: $src"
-            }
+$src = Get-SourcePath -Engine $meta.Engine -Version $meta.Version
+if (-not (Test-Path $src)) {
+    Write-WarningLog "📦 Missing source: $($meta.Engine) $($meta.Version) — attempting auto-fetch..."
+    if (Get-Command Get-SourceArchive -ErrorAction SilentlyContinue) {
+        $fetchedPath = Get-SourceArchive -Engine $meta.Engine -Version $meta.Version
+        if ($fetchedPath -and (Test-Path $fetchedPath)) {
+            $src = $fetchedPath
+            Write-InfoLog "✅ Auto-fetch successful: $src"
+        } else {
+            throw "Auto-fetch failed for $($meta.Engine) $($meta.Version)"
+        }
+    } else {
+        throw "Source directory missing and Get-SourceArchive not available: $src"
+    }
+}
 
             $buildStart = Get-Date
             $meta.Success = Build-LuaEngine @meta -SourcePath $src
@@ -402,7 +410,7 @@ catch {
 }
 #endregion
 
-#region Post-Build Processing
+#-------------region Post-Build Processing
 $successCount = ($Artifacts | Where-Object { $_.Success }).Count
 $failureCount = $Artifacts.Count - $successCount
 $totalDuration = [Math]::Round(((Get-Date) - $startTime).TotalMinutes, 2)
