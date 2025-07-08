@@ -1,3 +1,4 @@
+# cmake.psm1 - Fixed replacement logic
 function Generate-CMakeLists {
     param(
         [Parameter(Mandatory)]
@@ -5,80 +6,71 @@ function Generate-CMakeLists {
         [string]$Engine,
 
         [Parameter(Mandatory)]
-        [string]$Version,  # Removed ValidateSet to support LuaJIT versions
+        [string]$Version,
 
         [Parameter(Mandatory)]
         [string]$SourcePath,
 
         [Parameter(Mandatory)]
         [ValidateSet("static", "shared")]
-        [string]$BuildType
+        [string]$BuildType,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("msvc", "mingw", "clang")]
+        [string]$Compiler
     )
 
-    $templatesDir = Join-Path $PSScriptRoot "..\..\templates\cmake"
-    $defaultTemplate = "CMakeLists.lua.default.txt"
+    $templatesDir = Join-Path (Get-TemplatesRoot) "cmake"
 
-    # 1. Load base template
-    $templatePath = Join-Path $templatesDir $defaultTemplate
+    # Get base template
+    $templatePath = if ($Engine -eq "lua") {
+        Join-Path $templatesDir "CMakeLists.lua.default.txt"
+    } else {
+        Join-Path $templatesDir "CMakeLists.luajit.txt"
+    }
+
     if (-not (Test-Path $templatePath)) {
         throw "Base template not found: $templatePath"
     }
+
+    # Read base template content
     $content = Get-Content $templatePath -Raw
 
-    # 2. Apply version-specific configuration
-    $versionKey = if ($Engine -eq "lua") {
-        ($Version -split '\.')[0..1] -join '.'  # Extract major.minor (5.3, 5.4, etc.)
-    } else {
-        $Version  # For LuaJIT use full version (2.1, 2.1.0, etc.)
-    }
+    # Apply base replacements
+    $content = $content -replace '@LUA_VERSION@', $Version
+    $content = $content -replace '@SHARED_FLAG@',
+        $(if ($BuildType -eq "shared") { "ON" } else { "OFF" })
 
-    $versionTemplate = "CMakeLists.$versionKey.txt"
-    $versionConfigPath = Join-Path $templatesDir $versionTemplate
+    # Apply engine-specific replacements
+    if ($Engine -eq "lua") {
+        # Get version-specific configuration
+        $versionKey = $Version.Substring(0, 3)  # 5.4.8 -> 5.4
+        $versionTemplate = "CMakeLists.$versionKey.txt"
+        $versionPath = Join-Path $templatesDir $versionTemplate
 
-    if (Test-Path $versionConfigPath) {
-        $versionContent = Get-Content $versionConfigPath -Raw
+        if (-not (Test-Path $versionPath)) {
+            Write-WarningLog "⚠️ Version template not found: $versionPath"
+            $versionContent = "# No version-specific configuration"
+        } else {
+            $versionContent = Get-Content $versionPath -Raw
+            # Apply version replacements in version-specific content
+            $versionContent = $versionContent -replace '@LUA_VERSION@', $Version
+        }
+
+        # Insert version-specific content
         $content = $content -replace '@VERSION_SPECIFIC@', $versionContent
-    } else {
-        Write-WarningLog "⚠️ Version template not found: $versionTemplate"
+    }
+    else {
+        # LuaJIT specific replacements
+        $content = $content -replace '@GC64_FLAG@',
+            $(if ($Version -match "2\.1") { "-DLUAJIT_ENABLE_GC64" } else { "" })
     }
 
-    # 3. Apply engine-specific configuration
-    $engineTemplate = "CMakeLists.$Engine.txt"
-    $engineConfigPath = Join-Path $templatesDir $engineTemplate
-
-    if ($Engine -eq "luajit" -and (Test-Path $engineConfigPath)) {
-        $engineContent = Get-Content $engineConfigPath -Raw
-        $content = $content -replace '@ENGINE_SPECIFIC@', $engineContent
-
-        # Handle LuaJIT version parts
-        $versionParts = $Version -split '\.'
-        $content = $content -replace '\$\{LUA_VERSION_MAJOR\}', $versionParts[0]
-        if ($versionParts.Count -ge 2) {
-            $content = $content -replace '\$\{LUA_VERSION_MINOR\}', $versionParts[1]
-        }
-        if ($versionParts.Count -ge 3) {
-            $content = $content -replace '\$\{LUA_VERSION_PATCH\}', $versionParts[2]
-        }
-    }
-
-    # 4. Set build parameters
-    $replacements = @{
-        '@LIBRARY_TYPE@'   = if ($BuildType -eq "shared") { "SHARED" } else { "STATIC" }
-        '@SHARED_FLAG@'    = if ($BuildType -eq "shared") { "ON" } else { "OFF" }
-        '${LUA_VERSION}'   = $versionKey
-        '${LUA_ENGINE}'    = $Engine
-        '@GC64_FLAG@'      = if ($Engine -eq "luajit") { "-DLUAJIT_ENABLE_GC64" } else { "" }
-    }
-
-    foreach ($key in $replacements.Keys) {
-        $content = $content -replace [regex]::Escape($key), $replacements[$key]
-    }
-
-    # 5. Save generated file
+    # Save generated file
     $outputPath = Join-Path $SourcePath "CMakeLists.txt"
     try {
         Set-Content -Path $outputPath -Value $content -Encoding UTF8 -Force
-        Write-InfoLog "✅ Generated CMakeLists.txt for $Engine $Version ($BuildType)"
+        Write-InfoLog "✅ Generated CMakeLists.txt for $Engine $Version ($BuildType/$Compiler)"
         return $true
     }
     catch {
@@ -86,5 +78,3 @@ function Generate-CMakeLists {
         return $false
     }
 }
-
-Export-ModuleMember -Function Generate-CMakeLists

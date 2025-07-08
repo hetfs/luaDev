@@ -1,120 +1,62 @@
 # ===================================================
-# Lua 5.4 Specific Configuration
-# ===================================================
-# Applied after base template - contains 5.4-specific settings
+# 🔧 Lua 5.4 Specific Configuration
 # ===================================================
 
-# 1. Compatibility Settings
-# -------------------------
-# Maintain compatibility with Lua 5.3 APIs
-target_compile_definitions(lua PRIVATE LUA_COMPAT_5_3)
+# -------------------------------
+# 1. Compatibility & Safety Flags
+# -------------------------------
+target_compile_definitions(lua PRIVATE
+    LUA_COMPAT_5_3      # Enable compatibility with 5.3
+    LUA_USE_APICHECK    # Enable API consistency checks
+    LUA_USE_TOBE_CLOSED # Enable '__close' variable support
+)
 
-# 2. Version Properties
-# ---------------------
+# -------------------------------
+# 2. Version & ABI Properties
+# -------------------------------
 set_target_properties(lua PROPERTIES
-    VERSION ${LUA_VERSION}
-    SOVERSION 5.4
+    VERSION "@LUA_VERSION@"
+    SOVERSION "5.4"
 )
 
-# 3. 5.4 Specific Features
-# ------------------------
-target_compile_definitions(lua PRIVATE
-    # Enable new warning system
-    -DLUA_USE_APICHECK
+# -------------------------------
+# 3. GC64 Mode Toggle (Optional)
+# -------------------------------
+option(LUA_USE_GC64 "Enable GC64 mode for 64-bit garbage collector" OFF)
+if(LUA_USE_GC64)
+    target_compile_definitions(lua PRIVATE LUA_USE_GC64)
+endif()
 
-    # Enable assertions in debug builds
-    $<$<CONFIG:Debug>:-DLUA_USE_ASSERT>
-
-    # Enable new generational GC
-    -DLUA_USE_GC64
-
-    # To-be-closed variables
-    -DLUA_USE_TOBE_CLOSED
-)
-
-# 4. Additional Sources
-# ---------------------
-list(APPEND LUA_CORE_SOURCES
-    "src/lcorolib.c"    # Coroutine library
-    "src/ltests.c"      # Test suite
-    "src/lprefix.h"     # 5.4-specific prefix header
-)
-
-# 5. Module System Adjustments
-# ----------------------------
-# New package searchers in 5.4
-target_compile_definitions(lua PRIVATE
-    -DLUA_USE_MODULES
-    -DLUA_USE_SEARCHERS
-)
-
-# 6. Math Library Updates
-# -----------------------
-# New random generator and math functions
-target_compile_definitions(lua PRIVATE
-    -DLUA_USE_MATH_RANDOM
-    -DLUA_USE_MATH_TOINTEGER
-)
-
-# 7. UTF-8 Library Enhancements
-# -----------------------------
-# Additional UTF-8 validation features
-target_compile_definitions(lua PRIVATE
-    -DLUA_UTF8_EXTRA_VALIDATION
-)
-
-# 8. Debug Hook Improvements
-# --------------------------
-# Enhanced debugging capabilities
-target_compile_definitions(lua PRIVATE
-    -DLUA_USE_DEBUG_HOOKS
-)
-
-# 9. Stack Resizing Behavior
-# --------------------------
-# Optimize stack resizing (5.4 default)
-set_target_properties(lua PROPERTIES
-    LINK_FLAGS "-Wl,--stack,4194304"  # 4MB stack size
-)
-
-# 10. Windows-specific 5.4 Settings
-# ---------------------------------
+# -------------------------------
+# 4. Platform-Specific Defines
+# -------------------------------
 if(WIN32)
-    # New ANSI escape code handling
     target_compile_definitions(lua PRIVATE
-        -DLUA_USE_WINDOWS_ANSI
+        LUA_USE_WINDOWS_ANSI
+        LUA_USE_WINDOWS_UTF8
     )
-
-    # Console UTF-8 support
-    target_compile_definitions(lua PRIVATE
-        -DLUA_USE_WINDOWS_UTF8
-    )
-endif()
-
-# 11. Optimizations
-# -----------------
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(lua PRIVATE
-        -O3
-        -fno-stack-protector  # 5.4 manages its own stack protection
-        -flto
-    )
-
-    # Link-time optimizations
-    set_target_properties(lua PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE ON
-    )
-endif()
-
-# 12. Deprecation Handling
-# ------------------------
-# Silence compatibility warnings for cleaner builds
-if(MSVC)
-    target_compile_options(lua PRIVATE /wd4996)
 else()
-    target_compile_options(lua PRIVATE -Wno-deprecated-declarations)
+    target_compile_definitions(lua PRIVATE LUA_USE_POSIX)
 endif()
 
-# ===================================================
-# END Lua 5.4 Configuration
-# ===================================================
+# -------------------------------
+# 5. Compiler Optimization Flags
+# -------------------------------
+target_compile_options(lua PRIVATE
+    $<$<C_COMPILER_ID:GNU,Clang>:
+        -O3
+    >
+    $<$<C_COMPILER_ID:MSVC>:
+        /O2
+        /wd4996
+    >
+)
+
+# -------------------------------
+# 6. Language Standard
+# -------------------------------
+set_target_properties(lua PROPERTIES
+    C_STANDARD 99
+    C_STANDARD_REQUIRED YES
+    C_EXTENSIONS ON
+)

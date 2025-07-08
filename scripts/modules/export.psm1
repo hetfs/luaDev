@@ -1,147 +1,87 @@
-# export.psm1 — Log Export Helpers for luaDev (Markdown formatter)
-# Example Usage:
-# Export-LogAsMarkdown -MarkdownPath "logs/Lua/5.4.8.md" -LogLines $lines -Title "Lua 5.4.8 Log"
-# Export-LogAsMarkdown -MarkdownPath "test.md" -LogLines $lines -DryRun -Verbose
-
-# 🛡️ Fallback logging in case main logging module isn't loaded
-if (-not (Get-Command Write-InfoLog -ErrorAction SilentlyContinue)) {
-    function Write-InfoLog { param($msg) Write-Host "[INFO] $msg" -ForegroundColor Cyan }
-}
-if (-not (Get-Command Write-ErrorLog -ErrorAction SilentlyContinue)) {
-    function Write-ErrorLog { param($msg) Write-Host "[ERROR] $msg" -ForegroundColor Red }
-}
-if (-not (Get-Command Write-WarningLog -ErrorAction SilentlyContinue)) {
-    function Write-WarningLog { param($msg) Write-Host "[WARN] $msg" -ForegroundColor Yellow }
-}
-
-function Export-LogAsMarkdown {
-    <#
-    .SYNOPSIS
-        Converts log lines into a themed Markdown log grouped by engine/version.
-
-    .PARAMETER MarkdownPath
-        Path to write the `.md` log file.
-
-    .PARAMETER LogLines
-        Raw log lines to format into Markdown.
-
-    .PARAMETER Title
-        Optional Markdown page title.
-
-    .PARAMETER DryRun
-        Simulates export without writing to disk.
-    #>
-    param(
-        [Parameter(Mandatory)][string]$MarkdownPath,
-        [Parameter(Mandatory)][string[]]$LogLines,
-        [string]$Title = "📝 Build Log",
-        [switch]$DryRun
+# loader.psm1 - Enhanced module loader with dependency tracking
+function Import-LuaDevModules {
+    param (
+        [Parameter(Mandatory)][string]$ModulesPath,
+        [switch]$AllowFallback
     )
 
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
-    $newline   = [Environment]::NewLine
-
-    $header = @"
-# $Title
-
-**Generated on:** $timestamp
-
-"@
-
-    function Group-LogLinesByEngineAndVersion {
-        param ([string[]]$Lines)
-
-        $groups = @{}
-
-        foreach ($line in $Lines) {
-            if ($line -match '\[(?<level>[A-Z]+)\]\s+\[(?<engine>lua|luajit)\]\s+(?<version>[^\s]+)\s*-\s*(?<message>.+)') {
-                $level = $matches.level
-                $engine = $matches.engine.ToUpper()
-                $version = $matches.version
-                $key = "$engine $version"
-
-                if (-not $groups.ContainsKey($key)) {
-                    $groups[$key] = @{
-                        Success  = @()
-                        Warnings = @()
-                        Errors   = @()
-                        Other    = @()
-                    }
-                }
-
-                switch ($level) {
-                    "INFO" {
-                        if ($matches.message -match "Build successful") {
-                            $groups[$key].Success += $line
-                        } else {
-                            $groups[$key].Other += $line
-                        }
-                    }
-                    "WARN"  { $groups[$key].Warnings += $line }
-                    "ERROR" { $groups[$key].Errors += $line }
-                    default { $groups[$key].Other += $line }
-                }
-            }
-            else {
-                if (-not $groups.ContainsKey("Global")) {
-                    $groups["Global"] = @{
-                        Success  = @()
-                        Warnings = @()
-                        Errors   = @()
-                        Other    = @()
-                    }
-                }
-                $groups["Global"].Other += $line
-            }
-        }
-
-        return $groups
+    if (-not (Test-Path $ModulesPath)) {
+        throw "Modules path not found: $ModulesPath"
     }
 
-    try {
-        $grouped = Group-LogLinesByEngineAndVersion -Lines $LogLines
-        $content = $header
+    # 🔒 Strict module load order with dependency tracking
+    $loadOrder = @(
+        "globals.psm1",        # 🌐 Path helpers (must come first)
+        "environment.psm1",    # 🧭 OS detection
+        "versioning.psm1",     # 🔢 Version parsing
+        "logging.psm1",        # 📢 Logging functions
+        "downloader.psm1",     # ⬇️ Source fetching
+        "cmake.psm1",          # 🛠️ CMake config
+        "luaBuilder.psm1",     # 🔧 Lua build
+        "luajitBuilder.psm1",  # 🔧 LuaJIT build
+        "manifest.psm1",       # 🧾 Artifact tracking
+        "export.psm1",         # 📝 Markdown export
+        "logexporter.psm1"     # 📋 Docs export
+    )
 
-        foreach ($section in $grouped.Keys) {
-            $logs = $grouped[$section]
-            $content += "$newline---$newline### 🧩 $section$newline"
+    $global:loadedModules = [System.Collections.Generic.List[string]]::new()
+    $global:loadedModuleNames = [System.Collections.Generic.List[string]]::new()
 
-            if ($logs.Success.Count -gt 0) {
-                $content += "#### ✅ Success$newline```log$newline"
-                $content += ($logs.Success -join $newline)
-                $content += "$newline```$newline"
+    Write-Verbose "  [Loader] 🔍 Loading modules from: $ModulesPath"
+    Write-Verbose "  [Loader] 📋 Load order: $($loadOrder -join ', ')"
+
+    foreach ($module in $loadOrder) {
+        $fullPath = Join-Path $ModulesPath $module
+        if (Test-Path $fullPath) {
+            try {
+                # Get module name without extension
+                $moduleName = [System.IO.Path]::GetFileNameWithoutExtension($module)
+
+                # Skip if already loaded
+                if ($global:loadedModuleNames -contains $moduleName) {
+                    Write-Verbose "  [Loader] ⏩ $moduleName already loaded"
+                    continue
+                }
+
+                # Load the module
+                Write-Verbose "  [Loader] 🔄 Loading $moduleName..."
+                Import-Module -Name $fullPath -Force -DisableNameChecking -Scope Global -ErrorAction Stop
+
+                $global:loadedModules.Add($module)
+                $global:loadedModuleNames.Add($moduleName)
+                Write-Verbose "  [Loader] ✅ Loaded $moduleName"
             }
-
-            if ($logs.Warnings.Count -gt 0) {
-                $content += "#### ⚠️ Warnings$newline```log$newline"
-                $content += ($logs.Warnings -join $newline)
-                $content += "$newline```$newline"
-            }
-
-            if ($logs.Errors.Count -gt 0) {
-                $content += "#### ❌ Errors$newline```log$newline"
-                $content += ($logs.Errors -join $newline)
-                $content += "$newline```$newline"
-            }
-
-            if ($logs.Other.Count -gt 0) {
-                $content += "#### 📄 Other Logs$newline```log$newline"
-                $content += ($logs.Other -join $newline)
-                $content += "$newline```$newline"
+            catch {
+                Write-Warning "  [Loader] ❌ Failed to load $module - $($_.Exception.Message)"
             }
         }
-
-        if ($DryRun) {
-            Write-InfoLog "[DryRun] Would export Markdown log to: $MarkdownPath"
-            return
+        else {
+            Write-Warning "  [Loader] ⚠️ Module file not found: $fullPath"
         }
+    }
 
-        Set-Content -Path $MarkdownPath -Value $content -Encoding UTF8
-        Write-InfoLog "📄 Markdown log exported: $MarkdownPath"
+    # 🔁 Fallback loading for any missing modules
+    if ($AllowFallback) {
+        Write-Verbose "  [Loader] 🔁 Starting fallback module loading..."
+        Get-ChildItem -Path $ModulesPath -Filter *.psm1 | ForEach-Object {
+            $moduleName = $_.BaseName
+            if ($global:loadedModuleNames -notcontains $moduleName) {
+                try {
+                    Write-Verbose "  [Loader] 🔄 Loading fallback: $moduleName..."
+                    Import-Module -Name $_.FullName -Force -DisableNameChecking -Scope Global
+                    $global:loadedModules.Add($_.Name)
+                    $global:loadedModuleNames.Add($moduleName)
+                    Write-Verbose "  [Loader] ✅ Fallback loaded: $moduleName"
+                }
+                catch {
+                    Write-Warning "  [Loader] ❌ Fallback failed: $($_.Name) - $($_.Exception.Message)"
+                }
+            }
+        }
     }
-    catch {
-        Write-ErrorLog "❌ Failed to export Markdown log: $($_.Exception.Message)"
-    }
+
+    Write-Verbose "  [Loader] 🎯 Successfully loaded $($global:loadedModuleNames.Count) modules"
+    Write-Verbose "  [Loader] 📦 Modules loaded: $($global:loadedModuleNames -join ', ')"
 }
 
-Export-ModuleMember -Function Export-LogAsMarkdown
+Export-ModuleMember -Function Import-LuaDevModules

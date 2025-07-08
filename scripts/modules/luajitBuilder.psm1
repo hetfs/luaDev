@@ -1,19 +1,12 @@
-# luajitBuilder.psm1
-# ⚡ LuaJIT build module with optional DryRun simulation
+# luajitBuilder.psm1 - Enhanced LuaJIT build module
 
 function Build-LuaJIT {
     param (
         [Parameter(Mandatory)][string]$Version,
         [Parameter(Mandatory)][string]$SourcePath,
         [ValidateSet("static", "shared")][string]$BuildType = "static",
-        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang",
-        [switch]$DryRun
+        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang"
     )
-
-    if ($DryRun) {
-        Write-InfoLog "🧪 [DryRun] Would build LuaJIT $Version ($BuildType/$Compiler) at $SourcePath"
-        return $true
-    }
 
     try {
         # 1. Generate CMakeLists.txt
@@ -29,14 +22,34 @@ function Build-LuaJIT {
         New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 
         # 3. Configure CMake arguments
-        $cmakeArgs = @("-DCMAKE_BUILD_TYPE=Release", "-DTARGET_SYS=Windows")
+        $cmakeArgs = @(
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DLUAJIT_VERSION=$Version"
+        )
+
+        # Add platform-specific flags
+        if ($IsWindows) {
+            $cmakeArgs += "-DTARGET_SYS=Windows"
+        } elseif ($IsMacOS) {
+            $cmakeArgs += "-DTARGET_SYS=Darwin"
+        } else {
+            $cmakeArgs += "-DTARGET_SYS=Linux"
+        }
+
+        # Add compiler-specific flags
         switch ($Compiler) {
             "clang" {
                 $cmakeArgs += "-DCMAKE_C_COMPILER=clang"
-                $cmakeArgs += "-DCMAKE_ASM_FLAGS=-integrated-as"
+                $cmakeArgs += "-DCMAKE_ASM_COMPILER=clang"
             }
-            "mingw" { $cmakeArgs += "-G", "MinGW Makefiles" }
-            "msvc"  { $cmakeArgs += "-A", "x64" }
+            "mingw" {
+                $cmakeArgs += "-G", "MinGW Makefiles"
+                $cmakeArgs += "-DCMAKE_C_COMPILER=gcc"
+            }
+            "msvc"  {
+                $cmakeArgs += "-A", "x64"
+                $cmakeArgs += "-T", "host=x64"
+            }
         }
 
         # 4. Build process
@@ -49,30 +62,43 @@ function Build-LuaJIT {
             }
 
             Write-InfoLog "🏗️ Building LuaJIT $Version ($BuildType)"
-            & cmake --build . --config Release --parallel
+            $buildCommand = "cmake --build . --config Release --parallel"
+            Invoke-Expression $buildCommand
             if ($LASTEXITCODE -ne 0) {
                 throw "Build failed (exit $LASTEXITCODE)"
             }
 
             # 5. Artifact collection
             $artifactDir = Get-ArtifactPath -Engine "luajit" -Version $Version -BuildType $BuildType -Compiler $Compiler -Create
-            $binDir = if (Test-Path "$buildDir/bin") { "$buildDir/bin" } else { $buildDir }
 
-            $patterns = @(
-                "luajit.exe", "luajit", "luajit-*",
-                "lua51.dll", "liblua51.*",
-                "luajit.lib", "libluajit.*"
-            )
+            # Copy binaries from multiple locations
+            $copyPaths = @("$buildDir/bin", "$buildDir/lib", $buildDir)
+            $patterns = @("luajit*", "lua51*", "libluajit*")
 
             $copiedCount = 0
-            foreach ($pattern in $patterns) {
-                $binaries = Get-ChildItem -Path $binDir -Recurse -Include $pattern -ErrorAction SilentlyContinue
-                foreach ($file in $binaries) {
-                    $destPath = Join-Path $artifactDir $file.Name
-                    Copy-Item -Path $file.FullName -Destination $destPath -Force
-                    $copiedCount++
-                    Write-VerboseLog "📦 Copied: $($file.Name)"
+            foreach ($path in $copyPaths) {
+                if (Test-Path $path) {
+                    foreach ($pattern in $patterns) {
+                        $binaries = Get-ChildItem -Path $path -Recurse -Include $pattern -ErrorAction SilentlyContinue
+                        foreach ($file in $binaries) {
+                            # Skip directories and headers
+                            if ($file.PSIsContainer -or $file.Extension -eq ".h") { continue }
+
+                            $destPath = Join-Path $artifactDir $file.Name
+                            Copy-Item -Path $file.FullName -Destination $destPath -Force
+                            $copiedCount++
+                            Write-VerboseLog "📦 Copied: $($file.Name)"
+                        }
+                    }
                 }
+            }
+
+            # Copy headers for development
+            $headers = Get-ChildItem -Path $SourcePath -Recurse -Include "*.h"
+            foreach ($header in $headers) {
+                $destPath = Join-Path $artifactDir $header.Name
+                Copy-Item -Path $header.FullName -Destination $destPath -Force
+                Write-VerboseLog "📄 Copied header: $($header.Name)"
             }
 
             if ($copiedCount -eq 0) {

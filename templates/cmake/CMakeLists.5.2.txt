@@ -1,136 +1,54 @@
 # ===================================================
-# Lua 5.2 Specific Configuration
-# ===================================================
-# Applied after base template - contains 5.2-specific settings
+# 🔧 Lua 5.2 Specific Configuration
 # ===================================================
 
-# 1. COMPATIBILITY SETTINGS
-# Maintain compatibility with Lua 5.1 APIs
-target_compile_definitions(lua PRIVATE LUA_COMPAT_ALL)
-
-# 2. VERSION PROPERTIES
-set_target_properties(lua PROPERTIES
-    VERSION "${LUA_VERSION}"
-    SOVERSION "5.2"
-)
-
-# 3. CORE LIBRARIES
-# 3.1 Bitwise Operations (new in 5.2)
-target_compile_definitions(lua PRIVATE LUA_USE_BITLIB)
-list(APPEND LUA_CORE_SOURCES "src/lbitlib.c")
-
-# 3.2 Base Libraries
+# -------------------------------
+# 1. Compatibility Definitions
+# -------------------------------
 target_compile_definitions(lua PRIVATE
+    LUA_COMPAT_ALL      # Enable legacy features for 5.2
+    LUA_USE_BITLIB
     LUA_USE_BASELIB
     LUA_USE_PACKLIB
 )
 
-# 4. MODULE SYSTEM
-# New package loading system
-target_compile_definitions(lua PRIVATE
-    LUA_USE_MODULE_SYSTEM_5_2
-    LUA_USE_SEARCHERS
+# -------------------------------
+# 2. Version & ABI Properties
+# -------------------------------
+set_target_properties(lua PROPERTIES
+    VERSION "@LUA_VERSION@"
+    SOVERSION "5.2"
 )
 
-# 5. ENVIRONMENT HANDLING
-# New _ENV mechanism
-target_compile_definitions(lua PRIVATE
-    LUA_USE_ENVIRONMENTS
-    LUA_USE_GLOBAL_ENV
-)
-
-# 6. PERFORMANCE OPTIMIZATIONS
-# 6.1 Garbage Collector
-target_compile_definitions(lua PRIVATE LUA_USE_INCREMENTAL_GC)
-
-# 6.2 String Optimization
-target_compile_definitions(lua PRIVATE LUA_USE_STRING_OPT)
-
-# 7. DEBUGGING ENHANCEMENTS
-target_compile_definitions(lua PRIVATE
-    LUA_USE_DEBUG_EXT
-    LUA_USE_TRACE_CALLS
-)
-
-# 8. PLATFORM-SPECIFIC CONFIGURATION
+# -------------------------------
+# 3. Platform-Specific Defines
+# -------------------------------
 if(WIN32)
-    # 8.1 Console Encoding
     target_compile_definitions(lua PRIVATE LUA_USE_WINDOWS_CONSOLE)
-
-    # 8.2 Math Library Linking
-    target_link_libraries(lua m)
-
-    # 8.3 Stack Size (2MB)
-    set_target_properties(lua PROPERTIES LINK_FLAGS "/STACK:2097152")
 else()
-    # 8.4 POSIX-specific Settings
     target_compile_definitions(lua PRIVATE LUA_USE_POSIX)
-
-    # 8.5 Stack Size (2MB)
-    set_target_properties(lua PROPERTIES LINK_FLAGS "-Wl,--stack-size,2097154")
 endif()
 
-# 9. COMPILER FLAGS
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    # 9.1 General Optimization
-    target_compile_options(lua PRIVATE
+# -------------------------------
+# 4. Compiler Optimization Flags
+# -------------------------------
+target_compile_options(lua PRIVATE
+    $<$<C_COMPILER_ID:GNU,Clang>:
         -O2
         -fno-strict-aliasing
-    )
-
-    # 9.2 Warnings and Diagnostics
-    target_compile_options(lua PRIVATE
-        -Wno-deprecated-declarations
-        -Wno-strict-prototypes
-    )
-
-    # 9.3 Position Independent Code
-    if(BUILD_SHARED_LIBS)
-        target_compile_options(lua PRIVATE -fPIC)
-    endif()
-
-elseif(MSVC)
-    # 9.4 MSVC-specific Flags
-    target_compile_options(lua PRIVATE
+        -fstack-protector-strong
+    >
+    $<$<C_COMPILER_ID:MSVC>:
         /O2
-        /wd4996   # _CRT_SECURE_NO_WARNINGS
-        /wd4018   # signed/unsigned mismatch
-        /wd4244   # conversion from 'lua_Number' to 'int'
-    )
-endif()
+        /wd4996
+    >
+)
 
-# 10. STANDARD COMPLIANCE
+# -------------------------------
+# 5. Language Standard
+# -------------------------------
 set_target_properties(lua PROPERTIES
     C_STANDARD 99
-    C_STANDARD_REQUIRED ON
-    C_EXTENSIONS OFF
+    C_STANDARD_REQUIRED YES
+    C_EXTENSIONS ON
 )
-
-# 11. DEPRECATION HANDLING
-if(MSVC)
-    target_compile_options(lua PRIVATE /wd4996)  # Disable deprecated warnings
-else()
-    target_compile_options(lua PRIVATE -Wno-deprecated-declarations)
-endif()
-
-# 12. INSTALLATION ENHANCEMENTS
-install(FILES
-    src/lua.h
-    src/luaconf.h
-    src/lauxlib.h
-    src/lualib.h
-    DESTINATION include
-)
-
-# 13. EXPERIMENTAL FEATURES
-option(LUA_USE_EXPERIMENTAL "Enable experimental Lua 5.2 features" OFF)
-if(LUA_USE_EXPERIMENTAL)
-    target_compile_definitions(lua PRIVATE
-        LUA_USE_GOTO
-        LUA_USE_EPHEMERON_TABLES
-    )
-endif()
-
-# ===================================================
-# END Lua 5.2 Configuration
-# ===================================================

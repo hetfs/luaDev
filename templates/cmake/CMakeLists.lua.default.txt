@@ -1,125 +1,64 @@
 # ==============================================================
-# Lua/LuaJIT CMake Build Template - Version-Agnostic Base
-# ==============================================================
-# Placeholders replaced during build:
-#   @LIBRARY_TYPE@    → STATIC or SHARED
-#   @SHARED_FLAG@     → ON or OFF
-#   ${LUA_VERSION}    → Version (5.1, 5.2, 5.3, 5.4, 2.1)
-#   ${LUA_ENGINE}     → lua or luajit
-#   @VERSION_SPECIFIC@→ Version-specific configuration block
+# Enhanced Lua CMake Build Template (CMake 3.29+)
 # ==============================================================
 
-cmake_minimum_required(VERSION 3.12)
-project(lua C)
+cmake_minimum_required(VERSION 3.29)
+project(lua VERSION @LUA_VERSION@ LANGUAGES C)
 
 # =====================
 # 1. Core Configuration
 # =====================
-set(LUA_VERSION ${LUA_VERSION})
-set(LUA_ENGINE ${LUA_ENGINE})
+set(LUA_ENGINE "lua" CACHE STRING "Lua engine type")
 option(BUILD_SHARED_LIBS "Build shared library" @SHARED_FLAG@)
+option(BUILD_STANDALONE "Build standalone interpreter" ON)
+
+# Always compile with position-independent code
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # ===================
 # 2. Source Discovery
 # ===================
-# Base sources common to all versions
-file(GLOB LUA_CORE_SOURCES
+file(GLOB_RECURSE LUA_CORE_SOURCES CONFIGURE_DEPENDS
     "src/*.c"
     "src/*.h"
 )
 
-# Version-specific source adjustments
-if(LUA_ENGINE STREQUAL "lua")
-    # Lua-specific sources (all versions)
-    list(APPEND LUA_CORE_SOURCES
-        "src/lapi.c"
-        "src/lcode.c"
-        "src/ldebug.c"
-        "src/ldo.c"
-        "src/ldump.c"
-        "src/lfunc.c"
-        "src/lgc.c"
-        "src/llex.c"
-        "src/lmem.c"
-        "src/lobject.c"
-        "src/lopcodes.c"
-        "src/lparser.c"
-        "src/lstate.c"
-        "src/lstring.c"
-        "src/ltable.c"
-        "src/ltm.c"
-        "src/lundump.c"
-        "src/lvm.c"
-        "src/lzio.c"
-        "src/lauxlib.c"
-        "src/lbaselib.c"
-        "src/ldblib.c"
-        "src/liolib.c"
-        "src/lmathlib.c"
-        "src/loadlib.c"
-        "src/loslib.c"
-        "src/ltablib.c"
-        "src/lstrlib.c"
-        "src/linit.c"
-    )
-
-    # Lua 5.2+ additions
-    if(LUA_VERSION VERSION_GREATER_EQUAL "5.2")
-        list(APPEND LUA_CORE_SOURCES "src/lbitlib.c")
-    endif()
-
-    # Lua 5.3+ additions
-    if(LUA_VERSION VERSION_GREATER_EQUAL "5.3")
-        list(APPEND LUA_CORE_SOURCES "src/lutf8lib.c")
-    endif()
-
-    # Lua 5.4+ additions
-    if(LUA_VERSION VERSION_GREATER_EQUAL "5.4")
-        list(APPEND LUA_CORE_SOURCES "src/lcorolib.c")
-    endif()
-endif()
-
-# ============================
-# 3. Executable Configuration
-# ============================
-option(BUILD_STANDALONE "Build standalone interpreter" ON)
-
-if(BUILD_STANDALONE)
-    set(EXECUTABLE_SOURCES "src/lua.c")
-else()
-    # Remove standalone interpreter from library sources
-    list(REMOVE_ITEM LUA_CORE_SOURCES "src/lua.c")
-endif()
-
 # ===================
-# 4. Library Targets
+# 3. Library Targets
 # ===================
-add_library(lua @LIBRARY_TYPE@ ${LUA_CORE_SOURCES})
-target_include_directories(lua PUBLIC src)
-
-if(BUILD_STANDALONE)
-    add_executable(lua_exe ${EXECUTABLE_SOURCES})
-    target_link_libraries(lua_exe lua)
-    set_target_properties(lua_exe PROPERTIES OUTPUT_NAME "lua")
-endif()
+add_library(lua STATIC)
+target_sources(lua PRIVATE ${LUA_CORE_SOURCES})
+target_include_directories(lua PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # ================================
-# 5. Version-Specific Adjustments
+# 4. Version-Specific Adjustments
 # ================================
 @VERSION_SPECIFIC@
+
+# ========================
+# 5. Executable Target
+# ========================
+if(BUILD_STANDALONE)
+    add_executable(lua_exe "src/lua.c")
+    target_link_libraries(lua_exe PRIVATE lua)
+    set_target_properties(lua_exe PROPERTIES OUTPUT_NAME "lua")
+endif()
 
 # ======================
 # 6. Installation Setup
 # ======================
+include(GNUInstallDirs)
+
 install(TARGETS lua
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 if(BUILD_STANDALONE)
-    install(TARGETS lua_exe RUNTIME DESTINATION bin)
+    install(TARGETS lua_exe
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 endif()
 
 install(FILES
@@ -127,33 +66,37 @@ install(FILES
     src/luaconf.h
     src/lauxlib.h
     src/lualib.h
-    DESTINATION include
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 # =========================
 # 7. Platform-Specific Fixes
 # =========================
 if(WIN32)
-    # Windows DLL export handling
     if(BUILD_SHARED_LIBS)
         target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
     endif()
-
-    # MSVC runtime configuration
-    if(MSVC)
-        target_compile_options(lua PRIVATE /W3 /MT$<$<CONFIG:Debug>:d>)
-        set_target_properties(lua PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    endif()
+    target_link_options(lua PRIVATE "/STACK:4194304")
+else()
+    target_link_options(lua PRIVATE
+        "LINKER:--stack-size=4194304"
+    )
+    target_link_libraries(lua PRIVATE m)
 endif()
 
 # ===========================
-# 8. Compiler-Specific Flags
+# 8. Modern CMake Enhancements
 # ===========================
-if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-    target_compile_options(lua PRIVATE -Wno-implicit-fallthrough)
-endif()
+# Export compile_commands.json for tooling support
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# =================================================
-# END OF BASE TEMPLATE
-# Version/engine-specific content injected below ↓
-# =================================================
+# Security hardening flags for UNIX-like systems
+if(NOT WIN32)
+    target_compile_options(lua PRIVATE
+        -D_FORTIFY_SOURCE=2
+    )
+    target_link_options(lua PRIVATE
+        "LINKER:-z,relro"
+        "LINKER:-z,now"
+    )
+endif()

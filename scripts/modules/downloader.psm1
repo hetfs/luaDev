@@ -1,14 +1,12 @@
-# downloader.psm1
-# ⬇️ Downloads and extracts Lua or LuaJIT sources for luaDev builds
-
+# downloader.psm1 - Robust downloader with mirror support and enhanced diagnostics
 function Get-SourceArchive {
     <#
     .SYNOPSIS
-        Downloads and extracts the Lua or LuaJIT source code.
+        Downloads and extracts Lua/LuaJIT source with mirror fallback and better diagnostics
     .PARAMETER Engine
-        Engine name: 'lua' or 'luajit'
+        'lua' or 'luajit'
     .PARAMETER Version
-        Full semantic version (e.g. 5.4.8 or 2.1.0-beta3)
+        Semantic version (e.g. 5.4.8 or 2.1.0-beta3)
     #>
     param (
         [Parameter(Mandatory)][ValidateSet("lua", "luajit")]
@@ -36,39 +34,107 @@ function Get-SourceArchive {
         return $extractPath
     }
 
-    # 🌍 Download
-    $url = switch ($Engine) {
-        "lua"    { "https://www.lua.org/ftp/lua-$Version.tar.gz" }
-        "luajit" { "https://luajit.org/download/LuaJIT-$Version.tar.gz" }
+    # 🌍 Define mirrors with fallback options
+    $mirrors = @()
+    if ($Engine -eq "lua") {
+        $mirrors = @(
+            "https://www.lua.org/ftp/lua-$Version.tar.gz"
+        )
+    } else {
+        $mirrors = @(
+            "https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$Version.tar.gz"
+        )
     }
 
+    # 📥 Download from mirrors with retry logic
     $maxRetries = 3
-    for ($i = 1; $i -le $maxRetries; $i++) {
-        try {
-            Write-InfoLog "⬇️ Downloading $Engine $Version (attempt $i/$maxRetries)"
-            Invoke-WebRequest $url -OutFile $archivePath -UseBasicParsing -ErrorAction Stop
-            break
-        } catch {
-            if ($i -eq $maxRetries) {
-                Write-ErrorLog "❌ Download failed: $($_.Exception.Message)"
-                return $null
+    $downloaded = $false
+    $lastError = $null
+
+    foreach ($url in $mirrors) {
+        for ($i = 1; $i -le $maxRetries; $i++) {
+            try {
+                Write-InfoLog "⬇️ Downloading $Engine $Version from [$url] (attempt $i/$maxRetries)"
+
+                # Use TLS 1.2+ for secure connections
+                [Net.ServicePointManager]::SecurityProtocol =
+                    [Net.SecurityProtocolType]::Tls12 -bor
+                    [Net.SecurityProtocolType]::Tls11 -bor
+                    [Net.SecurityProtocolType]::Tls
+
+                # Modern download method
+                Invoke-WebRequest -Uri $url -OutFile $archivePath -UseBasicParsing -TimeoutSec 30
+                $downloaded = $true
+                Write-InfoLog "✅ Download completed successfully from $url"
+                break
             }
-            Start-Sleep -Seconds (5 * $i)
+            catch {
+                $lastError = $_.Exception.Message
+                Write-WarningLog "⚠️ Download attempt $i failed: $lastError"
+
+                # DNS-specific error handling
+                if ($lastError -match "No such host is known") {
+                    Write-VerboseLog "🔍 DNS resolution failed for $($url.Split('/')[2])"
+                }
+
+                # Sleep with exponential backoff
+                $sleepSeconds = [Math]::Pow(2, $i)  # 2, 4, 8 seconds
+                Write-VerboseLog "⏳ Retrying in $sleepSeconds seconds..."
+                Start-Sleep -Seconds $sleepSeconds
+            }
         }
+
+        if ($downloaded) { break }
     }
 
-    # 📦 Extract archive
-    try {
-        & tar xzf $archivePath -C $sourcesRoot
-        if (-not (Test-Path $checkFile)) {
-            throw "Extraction failed — expected file not found: $checkFile"
-        }
-    } catch {
-        Write-ErrorLog "❌ Extraction failed: $($_.Exception.Message)"
+    if (-not $downloaded) {
+        Write-ErrorLog "❌ All download attempts failed. Last error: $lastError"
         return $null
     }
 
-    # 🧩 Inject fallback CMakeLists.txt if not generated yet
+    # 📦 Extract archive with robust validation
+    $maxExtractAttempts = 2
+    $extracted = $false
+
+    for ($j = 1; $j -le $maxExtractAttempts; $j++) {
+        try {
+            Write-InfoLog "📦 Extracting $tarball (attempt $j/$maxExtractAttempts)"
+
+            # Use native tar command if available
+            if (Get-Command tar -ErrorAction SilentlyContinue) {
+                tar xzf $archivePath -C $sourcesRoot
+            }
+            else {
+                # Fallback to 7-Zip if available
+                $7zPath = "$env:ProgramFiles\7-Zip\7z.exe"
+                if (Test-Path $7zPath) {
+                    & $7zPath x $archivePath -o$sourcesRoot
+                }
+                else {
+                    throw "No extraction method available (tar or 7-Zip not found)"
+                }
+            }
+
+            # Verify extraction
+            if (-not (Test-Path $checkFile)) {
+                throw "Extraction failed - critical file missing: $($checkFile | Split-Path -Leaf)"
+            }
+
+            $extracted = $true
+            break
+        }
+        catch {
+            Write-WarningLog "⚠️ Extraction attempt $j failed: $($_.Exception.Message)"
+            Start-Sleep -Seconds (3 * $j)
+        }
+    }
+
+    if (-not $extracted) {
+        Write-ErrorLog "❌ All extraction attempts failed"
+        return $null
+    }
+
+    # 🧩 Inject fallback CMakeLists.txt if missing
     if (-not (Test-Path $cmakePath)) {
         $templateName = if ($Engine -eq "lua") { "CMakeLists.lua.txt" } else { "CMakeLists.luajit.txt" }
         $template     = Join-Path (Get-TemplatesRoot) "cmake\$templateName"
@@ -76,7 +142,8 @@ function Get-SourceArchive {
         if (Test-Path $template) {
             Copy-Item -Path $template -Destination $cmakePath -Force
             Write-InfoLog "🧩 Injected fallback template: $templateName"
-        } else {
+        }
+        else {
             Write-WarningLog "⚠️ No fallback template found for $Engine"
         }
     }

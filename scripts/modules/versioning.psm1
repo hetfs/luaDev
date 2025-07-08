@@ -1,6 +1,4 @@
-# versioning.psm1
-# 🔢 Version parsing, detection, and engine-specific validation for luaDev
-
+# versioning.psm1 - Enhanced version handling
 $script:SupportedLuaVersions    = @("5.1", "5.2", "5.3", "5.4")
 $script:SupportedLuaJITVersions = @("2.0", "2.1")
 
@@ -20,19 +18,23 @@ function Get-LatestEngineVersions {
         "lua" {
             try {
                 $response = Invoke-WebRequest "https://www.lua.org/versions.html" -UseBasicParsing -ErrorAction Stop
-                return [regex]::Matches($response.Content, 'lua-(\d+\.\d+\.\d+)\.tar\.gz') |
+                $versions = [regex]::Matches($response.Content, 'lua-(\d+\.\d+\.\d+)\.tar\.gz') |
                     ForEach-Object { $_.Groups[1].Value } |
                     Where-Object { $_ -match "^5\.(1|2|3|4)" } |
                     Sort-Object { [System.Version]$_ } -Descending |
                     Select-Object -First 4
+
+                # Normalize versions
+                return $versions | ForEach-Object {
+                    Convert-VersionShorthand -InputVersion $_
+                }
             } catch {
-                Write-WarningLog "⚠️ Could not fetch from lua.org — using fallback"
+                Write-WarningLog "⚠️ Could not fetch from lua.org — using offline fallback"
                 return @("5.4.8", "5.3.6", "5.2.4", "5.1.5")
             }
         }
 
         "luajit" {
-            # LuaJIT has fewer versions and no consistent online source
             return @("2.1.0-beta3", "2.0.5")
         }
     }

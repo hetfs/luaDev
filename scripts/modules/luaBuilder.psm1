@@ -1,31 +1,20 @@
-# luaBuilder.psm1
+# luaBuilder.psm1 - Enhanced Lua build process with version-specific templates
 
 function Build-LuaEngine {
     param (
-        [Parameter(Mandatory)][string]$Engine,
         [Parameter(Mandatory)][string]$Version,
         [Parameter(Mandatory)][string]$SourcePath,
         [ValidateSet("static", "shared")][string]$BuildType = "static",
-        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang",
-        [switch]$DryRun
+        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang"
     )
 
-    # ✅ Simulate build in DryRun mode
-    if ($DryRun) {
-        Write-InfoLog "🧪 [DryRun] Would build Lua $Version ($BuildType / $Compiler) at $SourcePath"
-        Write-InfoLog "✅ [DryRun] Simulated build completed: $Engine $Version ($BuildType / $Compiler)"
-        return $true
-    }
-
-    if (-not (Test-Path $SourcePath)) {
-        Write-ErrorLog "❌ Source directory not found: $SourcePath"
-        return $false
-    }
+    $Engine = "lua"
+    $baseVersion = $Version.Substring(0, 3)
 
     try {
-        # 1. Generate CMakeLists.txt
+        # 1. Generate CMakeLists.txt using version-specific template
         $generateResult = Generate-CMakeLists -Engine $Engine -Version $Version `
-            -SourcePath $SourcePath -BuildType $BuildType
+            -SourcePath $SourcePath -BuildType $BuildType -Compiler $Compiler
         if (-not $generateResult) {
             throw "CMakeLists generation failed"
         }
@@ -37,50 +26,58 @@ function Build-LuaEngine {
         }
         New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 
-        # 3. Configure CMake arguments
+        # 3. Configure CMake arguments based on compiler
         $cmakeArgs = @("-DCMAKE_BUILD_TYPE=Release")
+
         switch ($Compiler) {
-            "clang"  { $cmakeArgs += "-DCMAKE_C_COMPILER=clang" }
-            "mingw"  { $cmakeArgs += "-G", "MinGW Makefiles" }
-            "msvc"   { $cmakeArgs += "-A", "x64" }
-            default  { Write-WarningLog "⚠️ Using default CMake generator for $Compiler" }
+            "clang" {
+                $cmakeArgs += "-DCMAKE_C_COMPILER=clang"
+            }
+            "mingw" {
+                $cmakeArgs += "-G", "MinGW Makefiles"
+                $cmakeArgs += "-DCMAKE_C_COMPILER=gcc"
+            }
+            "msvc" {
+                $cmakeArgs += "-A", "x64"
+                $cmakeArgs += "-T", "host=x64"
+            }
         }
 
         # 4. Execute build process
         Push-Location $buildDir
         try {
-            Write-InfoLog "🛠️ Configuring CMake for $($Engine.ToUpper()) $Version"
+            Write-InfoLog "🛠️ Configuring CMake for Lua $Version ($Compiler)"
             & cmake $SourcePath @cmakeArgs
             if ($LASTEXITCODE -ne 0) {
                 throw "CMake configuration failed (exit $LASTEXITCODE)"
             }
 
-            Write-InfoLog "🏗️ Building $($Engine.ToUpper()) $Version with $Compiler..."
-            $buildCommand = if ($IsWindows -and $Compiler -eq "msvc") {
-                "cmake --build . --config Release --parallel"
-            } else {
-                "cmake --build . --config Release --parallel"
-            }
-            Invoke-Expression $buildCommand
+            Write-InfoLog "🏗️ Building Lua $Version with $Compiler ($BuildType)..."
+            & cmake --build . --config Release --parallel
             if ($LASTEXITCODE -ne 0) {
                 throw "Build failed (exit $LASTEXITCODE)"
             }
 
-            # 5. Collect artifacts
+            # 5. Prepare artifact directory
             $artifactDir = Get-ArtifactPath -Engine $Engine -Version $Version `
-                -BuildType $BuildType -Compiler $Compiler -Create
-            $binDir = if (Test-Path "$buildDir/bin") { "$buildDir/bin" } else { $buildDir }
+                -BuildType $BuildType -Compiler $Compiler
 
-            $patterns = if ($Engine -eq "luajit") {
-                @("*.exe", "*.dll", "*.lib", "*.a", "*.so", "*.dylib", "luajit*")
-            } else {
-                @("*.exe", "*.dll", "*.lib", "*.a", "*.so", "*.dylib", "lua*")
+            if (-not (Test-Path $artifactDir)) {
+                New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null
             }
 
+            # Determine bin/lib dirs
+            $binDir = if (Test-Path "$buildDir/bin") { "$buildDir/bin" } else { $buildDir }
+            $libDir = if (Test-Path "$buildDir/lib") { "$buildDir/lib" } else { $buildDir }
+
+            # 6. Copy artifacts
+            $patterns = @("lua*", "liblua.*", "*.a", "*.lib", "*.dll", "*.so", "*.dylib")
             $copiedCount = 0
+
             foreach ($pattern in $patterns) {
-                $binaries = Get-ChildItem -Path $binDir -Recurse -Include $pattern -ErrorAction SilentlyContinue
-                foreach ($file in $binaries) {
+                $files = Get-ChildItem -Path $binDir, $libDir -Recurse -Include $pattern -ErrorAction SilentlyContinue
+                foreach ($file in $files) {
+                    if ($file.PSIsContainer -or $file.Extension -eq ".h") { continue }
                     $destPath = Join-Path $artifactDir $file.Name
                     Copy-Item -Path $file.FullName -Destination $destPath -Force
                     $copiedCount++
@@ -92,11 +89,19 @@ function Build-LuaEngine {
                 throw "No binaries copied from build directory"
             }
 
-            Write-InfoLog "✅ Build successful - $copiedCount artifacts saved to: $artifactDir"
+            # 7. Copy headers
+            $headers = Get-ChildItem -Path $SourcePath -Recurse -Include "*.h"
+            foreach ($header in $headers) {
+                $destPath = Join-Path $artifactDir $header.Name
+                Copy-Item -Path $header.FullName -Destination $destPath -Force
+                Write-VerboseLog "📄 Copied header: $($header.Name)"
+            }
+
+            Write-InfoLog "✅ Lua $Version build successful - $copiedCount artifacts saved to: $artifactDir"
             return $true
         }
         catch {
-            Write-ErrorLog "❌ $($Engine.ToUpper()) build failed: $($_.Exception.Message)"
+            Write-ErrorLog "❌ Lua build failed: $($_.Exception.Message)"
             return $false
         }
         finally {
@@ -104,7 +109,7 @@ function Build-LuaEngine {
         }
     }
     catch {
-        Write-ErrorLog "❌ Build failed: $($_.Exception.Message)"
+        Write-ErrorLog "❌ Lua build failed: $($_.Exception.Message)"
         return $false
     }
 }

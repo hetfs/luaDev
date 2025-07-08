@@ -1,6 +1,4 @@
-# environment.psm1
-# 🧭 OS, architecture, and toolchain environment detection for luaDev
-
+# environment.psm1 - Enhanced platform detection
 function Get-OSPlatform {
     <#
     .SYNOPSIS
@@ -8,13 +6,6 @@ function Get-OSPlatform {
     .OUTPUTS
         A hashtable with keys: Platform, Architecture, Cores
     #>
-
-    $arch = switch -Regex ($env:PROCESSOR_ARCHITECTURE) {
-        "ARM64"  { "arm64"; break }
-        "AMD64"  { "x64"; break }
-        default  { "x64" }
-    }
-
     $platform = if ($IsWindows) {
         "windows"
     } elseif ($IsLinux) {
@@ -23,6 +14,23 @@ function Get-OSPlatform {
         "macos"
     } else {
         "unknown"
+    }
+
+    # Unified architecture naming
+    $arch = if ($IsWindows) {
+        switch -Regex ($env:PROCESSOR_ARCHITECTURE) {
+            "ARM64"  { "arm64" }
+            "AMD64"  { "x64" }
+            default  { "x86" }
+        }
+    }
+    else {
+        $uname = (uname -m) 2>$null
+        switch -Regex ($uname) {
+            "x86_64"  { "x64" }
+            "aarch64|arm64" { "arm64" }
+            default { $uname }
+        }
     }
 
     $cores = if ($IsWindows) {
