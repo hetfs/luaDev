@@ -5,7 +5,8 @@ function Build-LuaEngine {
         [Parameter(Mandatory)][string]$Version,
         [Parameter(Mandatory)][string]$SourcePath,
         [ValidateSet("static", "shared")][string]$BuildType = "static",
-        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang"
+        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang",
+        [switch]$PreviewOnly
     )
 
     $Engine = "lua"
@@ -14,9 +15,14 @@ function Build-LuaEngine {
     try {
         # 1. Generate CMakeLists.txt using version-specific template
         $generateResult = Generate-CMakeLists -Engine $Engine -Version $Version `
-            -SourcePath $SourcePath -BuildType $BuildType -Compiler $Compiler
+            -SourcePath $SourcePath -BuildType $BuildType -Compiler $Compiler `
+            -PreviewOnly:$PreviewOnly
         if (-not $generateResult) {
             throw "CMakeLists generation failed"
+        }
+
+        if ($PreviewOnly) {
+            return $true
         }
 
         # 2. Prepare build directory

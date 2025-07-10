@@ -1,72 +1,155 @@
-# logexporter.psm1 — Export Build Logs to docs/dev/logs/
-# Example Usage:
-# Export-BuildLogsToDocs -DryRun -Verbose
-# Export-BuildLogsToDocs -Force
+# logExporter.psm1 — Log Export Helpers for luaDev (Markdown formatter)
 
-function Export-BuildLogsToDocs {
+# 🛡️ Fallback logging in case main logging module isn't loaded
+if (-not (Get-Command Write-InfoLog -ErrorAction SilentlyContinue)) {
+    function Write-InfoLog { param($msg) Write-Host "[INFO] $msg" -ForegroundColor Cyan }
+}
+if (-not (Get-Command Write-ErrorLog -ErrorAction SilentlyContinue)) {
+    function Write-ErrorLog { param($msg) Write-Host "[ERROR] $msg" -ForegroundColor Red }
+}
+if (-not (Get-Command Write-WarningLog -ErrorAction SilentlyContinue)) {
+    function Write-WarningLog { param($msg) Write-Host "[WARN] $msg" -ForegroundColor Yellow }
+}
+
+function Export-LogAsMarkdown {
     <#
     .SYNOPSIS
-        Copies all Markdown build logs to the Docusaurus documentation folder.
+        Converts log lines into a structured Markdown log.
 
-    .PARAMETER DocsRoot
-        Destination path (defaults to 'docs/dev/logs' inside the project root).
+    .PARAMETER LogLines
+        Array of raw log lines to export.
 
-    .PARAMETER Force
-        Overwrites existing logs if present.
+    .PARAMETER Title
+        Optional title for the Markdown file.
+
+    .PARAMETER Path
+        Full path to the output Markdown file.
 
     .PARAMETER DryRun
-        Simulates log export without actually copying files.
+        If present, simulates export without writing to disk.
     #>
+    [CmdletBinding()]
     param(
-        [string]$DocsRoot = (Join-Path (Get-ProjectRoot) "docs/dev/logs"),
-        [switch]$Force,
+        [Parameter(Mandatory)][string[]]$LogLines,
+        [string]$Title = "📝 Build Log",
+        [string]$Path = (Join-Path -Resolve $PSScriptRoot "../logs/build.md"),
         [switch]$DryRun
     )
 
-    $logsRoot = Get-ScriptsLogsRoot
-    if (-not (Test-Path $logsRoot)) {
-        Write-WarningLog "⚠️ No logs found at: $logsRoot"
-        return
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC"
+    $newline = [Environment]::NewLine
+    $dir = Split-Path -Parent $Path
+
+    function Group-LogLinesByEngineAndVersion {
+        param ([string[]]$Lines)
+
+        $groups = @{}
+
+        foreach ($line in $Lines) {
+            if ($line -match '\[(?<level>[A-Z]+)\]\s+\[(?<engine>lua|luajit)\]\s+(?<version>[^\s]+)\s*-\s*(?<message>.+)') {
+                $level = $matches.level
+                $engine = $matches.engine.ToUpper()
+                $version = $matches.version
+                $key = "$engine $version"
+
+                if (-not $groups.ContainsKey($key)) {
+                    $groups[$key] = @{
+                        Success  = @()
+                        Warnings = @()
+                        Errors   = @()
+                        Other    = @()
+                    }
+                }
+
+                switch ($level) {
+                    "INFO" {
+                        if ($matches.message -match "Build successful") {
+                            $groups[$key].Success += $line
+                        } else {
+                            $groups[$key].Other += $line
+                        }
+                    }
+                    "WARN"  { $groups[$key].Warnings += $line }
+                    "ERROR" { $groups[$key].Errors += $line }
+                    default { $groups[$key].Other += $line }
+                }
+            }
+            else {
+                if (-not $groups.ContainsKey("Global")) {
+                    $groups["Global"] = @{
+                        Success  = @()
+                        Warnings = @()
+                        Errors   = @()
+                        Other    = @()
+                    }
+                }
+                $groups["Global"].Other += $line
+            }
+        }
+
+        return $groups
     }
 
-    if (-not (Test-Path $DocsRoot) -and -not $DryRun) {
-        New-Item -ItemType Directory -Path $DocsRoot -Force | Out-Null
-    }
+    try {
+        $header = @"
+# $Title
 
-    $logFiles = Get-ChildItem -Path $logsRoot -Recurse -Filter *.md -File
-    if ($logFiles.Count -eq 0) {
-        Write-WarningLog "⚠️ No Markdown logs to export"
-        return
-    }
+**Generated on:** $timestamp
 
-    foreach ($file in $logFiles) {
-        $relativePath = $file.FullName.Substring($logsRoot.Length).TrimStart('\', '/')
-        $targetPath = Join-Path $DocsRoot $relativePath
-        $targetDir  = Split-Path $targetPath -Parent
+"@
+
+        $grouped = Group-LogLinesByEngineAndVersion -Lines $LogLines
+        $content = $header
+
+        foreach ($section in $grouped.Keys) {
+            $logs = $grouped[$section]
+            $content += "$newline---$newline### 🧹 $section$newline"
+
+            if ($logs.Success.Count -gt 0) {
+                $content += "#### ✅ Success$newline```log$newline"
+                $content += ($logs.Success -join $newline)
+                $content += "$newline```$newline"
+            }
+
+            if ($logs.Warnings.Count -gt 0) {
+                $content += "#### ⚠️ Warnings$newline```log$newline"
+                $content += ($logs.Warnings -join $newline)
+                $content += "$newline```$newline"
+            }
+
+            if ($logs.Errors.Count -gt 0) {
+                $content += "#### ❌ Errors$newline```log$newline"
+                $content += ($logs.Errors -join $newline)
+                $content += "$newline```$newline"
+            }
+
+            if ($logs.Other.Count -gt 0) {
+                $content += "#### 📄 Other Logs$newline```log$newline"
+                $content += ($logs.Other -join $newline)
+                $content += "$newline```$newline"
+            }
+        }
 
         if ($DryRun) {
-            Write-VerboseLog "[DryRun] Would export log → $targetPath"
-            continue
+            Write-InfoLog "[DryRun] Would export Markdown log to: $Path"
+            return
         }
 
-        if (-not (Test-Path $targetDir)) {
-            New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+        if (-not (Test-Path $dir)) {
+            New-Item -Path $dir -ItemType Directory -Force | Out-Null
         }
 
-        if (-not (Test-Path $targetPath) -or $Force) {
-            Copy-Item -Path $file.FullName -Destination $targetPath -Force
-            Write-InfoLog "📤 Exported log → $targetPath"
-        }
-        else {
-            Write-VerboseLog "ℹ️ Skipped existing log: $targetPath"
-        }
+        # 🛉 Clean other md files in same folder except the target one
+        Get-ChildItem -Path $dir -Filter "*.md" -File |
+            Where-Object { $_.FullName -ne $Path } |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+
+        Set-Content -Path $Path -Value $content -Encoding UTF8
+        Write-InfoLog "📄 Markdown log exported: $Path"
     }
-
-    if (-not $DryRun) {
-        Write-InfoLog "✅ All logs exported to Docusaurus: $DocsRoot"
-    } else {
-        Write-InfoLog "✅ [DryRun] Log export simulation complete"
+    catch {
+        Write-ErrorLog "❌ Failed to export Markdown log: $($_.Exception.Message)"
     }
 }
 
-Export-ModuleMember -Function Export-BuildLogsToDocs
+Export-ModuleMember -Function Export-LogAsMarkdown

@@ -5,7 +5,7 @@ events:
     kind: "message-v1"
     backtrace:
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineSystem.cmake:205 (message)"
-      - "CMakeLists.txt:6 (project)"
+      - "CMakeLists.txt:2 (project)"
     message: |
       The system is: Windows - 6.2.9200 - AMD64
   -
@@ -14,7 +14,7 @@ events:
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
-      - "CMakeLists.txt:6 (project)"
+      - "CMakeLists.txt:2 (project)"
     message: |
       Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
       Compiler: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/clang.exe 
@@ -31,16 +31,55 @@ events:
         D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/3.29.2/CompilerIdC/a.exe
       
   -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake:1178 (message)"
+      - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineASMCompiler.cmake:135 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Checking whether the ASM compiler is GNU using "--version" did not match "(GNU assembler)|(GCC)|(Free Software Foundation)":
+      clang version 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082)
+      Target: x86_64-w64-windows-gnu
+      Thread model: posix
+      InstalledDir: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin
+      Configuration file: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/x86_64-w64-windows-gnu.cfg
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake:1178 (message)"
+      - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineASMCompiler.cmake:135 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Checking whether the ASM compiler is AppleClang using "--version" did not match "(Apple (clang|LLVM) version)":
+      clang version 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082)
+      Target: x86_64-w64-windows-gnu
+      Thread model: posix
+      InstalledDir: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin
+      Configuration file: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/x86_64-w64-windows-gnu.cfg
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake:1165 (message)"
+      - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineASMCompiler.cmake:135 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Checking whether the ASM compiler is Clang using "--version" matched "(clang version)":
+      clang version 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082)
+      Target: x86_64-w64-windows-gnu
+      Thread model: posix
+      InstalledDir: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin
+      Configuration file: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/x86_64-w64-windows-gnu.cfg
+  -
     kind: "try_compile-v1"
     backtrace:
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake:64 (try_compile)"
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
-      - "CMakeLists.txt:6 (project)"
+      - "CMakeLists.txt:2 (project)"
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn"
-      binary: "D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn"
+      source: "D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058"
+      binary: "D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058"
     cmakeVariables:
       CMAKE_C_FLAGS: ""
       CMAKE_C_FLAGS_DEBUG: "-g"
@@ -49,17 +88,17 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn'
+        Change Dir: 'D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058'
         
-        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_83b21
-        [1/2] C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe   -v -MD -MT CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -MF CMakeFiles\\cmTC_83b21.dir\\CMakeCCompilerABI.c.obj.d -o CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c
+        Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_7cd9a
+        [1/2] C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe   -v -MD -MT CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -MF CMakeFiles\\cmTC_7cd9a.dir\\CMakeCCompilerABI.c.obj.d -o CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c
         clang version 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082)
         Target: x86_64-w64-windows-gnu
         Thread model: posix
         InstalledDir: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin
         Configuration file: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/x86_64-w64-windows-gnu.cfg
          (in-process)
-         "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/clang-20.exe" -cc1 -triple x86_64-w64-windows-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=none -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -mms-bitfields -funwind-tables=2 -fno-sized-deallocation -fno-use-init-array -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn -v -fcoverage-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn -resource-dir C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20 -dependency-file "CMakeFiles\\\\cmTC_83b21.dir\\\\CMakeCCompilerABI.c.obj.d" -MT CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -sys-header-deps -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/usr/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/include -ferror-limit 19 -fno-use-cxa-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -exception-model=seh -faddrsig -o CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -x c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c
+         "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/clang-20.exe" -cc1 -triple x86_64-w64-windows-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=none -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -mms-bitfields -funwind-tables=2 -fno-sized-deallocation -fno-use-init-array -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058 -v -fcoverage-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058 -resource-dir C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20 -dependency-file "CMakeFiles\\\\cmTC_7cd9a.dir\\\\CMakeCCompilerABI.c.obj.d" -MT CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -sys-header-deps -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/usr/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/include -ferror-limit 19 -fno-use-cxa-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -exception-model=seh -faddrsig -o CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -x c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c
         clang -cc1 version 20.1.7 based upon LLVM 20.1.7 default target x86_64-w64-mingw32
         ignoring nonexistent directory "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/include"
         ignoring nonexistent directory "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/usr/include"
@@ -68,13 +107,13 @@ events:
          C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/include\x0d
          C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/include\x0d
         End of search list.\x0d
-        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe  -v -Wl,-v CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -o cmTC_83b21.exe -Wl,--out-implib,libcmTC_83b21.dll.a -Wl,--major-image-version,0,--minor-image-version,0   && cd ."
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe  -v -Wl,-v CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -o cmTC_7cd9a.exe -Wl,--out-implib,libcmTC_7cd9a.dll.a -Wl,--major-image-version,0,--minor-image-version,0   && cd ."
         clang version 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082)
         Target: x86_64-w64-windows-gnu
         Thread model: posix
         InstalledDir: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin
         Configuration file: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/x86_64-w64-windows-gnu.cfg
-         "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/ld.lld" -m i386pep -Bdynamic -o cmTC_83b21.exe C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crt2.o C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtbegin.o -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/mingw/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows -v CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj --out-implib libcmTC_83b21.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtend.o\x0d
+         "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/ld.lld" -m i386pep -Bdynamic -o cmTC_7cd9a.exe C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crt2.o C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtbegin.o -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/mingw/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows -v CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj --out-implib libcmTC_7cd9a.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtend.o\x0d
         LLD 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082) (compatible with GNU linkers)
         
       exitCode: 0
@@ -83,7 +122,7 @@ events:
     backtrace:
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake:134 (message)"
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
-      - "CMakeLists.txt:6 (project)"
+      - "CMakeLists.txt:2 (project)"
     message: |
       Parsed C implicit include dir info: rv=done
         found start of include info
@@ -101,22 +140,22 @@ events:
     backtrace:
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake:170 (message)"
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
-      - "CMakeLists.txt:6 (project)"
+      - "CMakeLists.txt:2 (project)"
     message: |
       Parsed C implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?))("|,| |$)]
-        ignore line: [Change Dir: 'D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn']
+        ignore line: [Change Dir: 'D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058']
         ignore line: []
-        ignore line: [Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_83b21]
-        ignore line: [[1/2] C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe   -v -MD -MT CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -MF CMakeFiles\\cmTC_83b21.dir\\CMakeCCompilerABI.c.obj.d -o CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
+        ignore line: [Run Build Command(s): C:/Strawberry/c/bin/ninja.exe -v cmTC_7cd9a]
+        ignore line: [[1/2] C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe   -v -MD -MT CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -MF CMakeFiles\\cmTC_7cd9a.dir\\CMakeCCompilerABI.c.obj.d -o CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
         ignore line: [clang version 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082)]
         ignore line: [Target: x86_64-w64-windows-gnu]
         ignore line: [Thread model: posix]
         ignore line: [InstalledDir: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin]
         ignore line: [Configuration file: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/x86_64-w64-windows-gnu.cfg]
         ignore line: [ (in-process)]
-        ignore line: [ "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/clang-20.exe" -cc1 -triple x86_64-w64-windows-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=none -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -mms-bitfields -funwind-tables=2 -fno-sized-deallocation -fno-use-init-array -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn -v -fcoverage-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-5q83yn -resource-dir C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20 -dependency-file "CMakeFiles\\\\cmTC_83b21.dir\\\\CMakeCCompilerABI.c.obj.d" -MT CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -sys-header-deps -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/usr/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/include -ferror-limit 19 -fno-use-cxa-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -exception-model=seh -faddrsig -o CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -x c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
+        ignore line: [ "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/clang-20.exe" -cc1 -triple x86_64-w64-windows-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=none -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -mms-bitfields -funwind-tables=2 -fno-sized-deallocation -fno-use-init-array -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058 -v -fcoverage-compilation-dir=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang/CMakeFiles/CMakeScratch/TryCompile-8ql058 -resource-dir C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20 -dependency-file "CMakeFiles\\\\cmTC_7cd9a.dir\\\\CMakeCCompilerABI.c.obj.d" -MT CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -sys-header-deps -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/usr/include -internal-isystem C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/include -ferror-limit 19 -fno-use-cxa-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -exception-model=seh -faddrsig -o CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -x c C:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
         ignore line: [clang -cc1 version 20.1.7 based upon LLVM 20.1.7 default target x86_64-w64-mingw32]
         ignore line: [ignoring nonexistent directory "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/include"]
         ignore line: [ignoring nonexistent directory "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/usr/include"]
@@ -125,19 +164,19 @@ events:
         ignore line: [ C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/include\x0d]
         ignore line: [ C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/include\x0d]
         ignore line: [End of search list.\x0d]
-        ignore line: [[2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe  -v -Wl -v CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj -o cmTC_83b21.exe -Wl --out-implib libcmTC_83b21.dll.a -Wl --major-image-version 0 --minor-image-version 0   && cd ."]
+        ignore line: [[2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\Fredaws\\AppData\\Local\\Microsoft\\WinGet\\Packages\\MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\llvm-mingw-20250613-msvcrt-x86_64\\bin\\clang.exe  -v -Wl -v CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj -o cmTC_7cd9a.exe -Wl --out-implib libcmTC_7cd9a.dll.a -Wl --major-image-version 0 --minor-image-version 0   && cd ."]
         ignore line: [clang version 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082)]
         ignore line: [Target: x86_64-w64-windows-gnu]
         ignore line: [Thread model: posix]
         ignore line: [InstalledDir: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin]
         ignore line: [Configuration file: C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/x86_64-w64-windows-gnu.cfg]
-        link line: [ "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/ld.lld" -m i386pep -Bdynamic -o cmTC_83b21.exe C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crt2.o C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtbegin.o -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/mingw/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows -v CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj --out-implib libcmTC_83b21.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtend.o\x0d]
+        link line: [ "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/ld.lld" -m i386pep -Bdynamic -o cmTC_7cd9a.exe C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crt2.o C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtbegin.o -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/mingw/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib -LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows -v CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj --out-implib libcmTC_7cd9a.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows/libclang_rt.builtins-x86_64.a -lunwind -lmoldname -lmingwex -lmsvcrt -lkernel32 C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtend.o\x0d]
           arg [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/ld.lld] ==> ignore
           arg [-m] ==> ignore
           arg [i386pep] ==> ignore
           arg [-Bdynamic] ==> search dynamic
           arg [-o] ==> ignore
-          arg [cmTC_83b21.exe] ==> ignore
+          arg [cmTC_7cd9a.exe] ==> ignore
           arg [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crt2.o] ==> obj [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crt2.o]
           arg [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtbegin.o] ==> obj [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib/crtbegin.o]
           arg [-LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib] ==> dir [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/x86_64-w64-mingw32/lib]
@@ -145,9 +184,9 @@ events:
           arg [-LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib] ==> dir [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib]
           arg [-LC:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows] ==> dir [C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/lib/clang/20/lib/windows]
           arg [-v] ==> ignore
-          arg [CMakeFiles/cmTC_83b21.dir/CMakeCCompilerABI.c.obj] ==> ignore
+          arg [CMakeFiles/cmTC_7cd9a.dir/CMakeCCompilerABI.c.obj] ==> ignore
           arg [--out-implib] ==> ignore
-          arg [libcmTC_83b21.dll.a] ==> ignore
+          arg [libcmTC_7cd9a.dll.a] ==> ignore
           arg [--major-image-version] ==> ignore
           arg [0] ==> ignore
           arg [--minor-image-version] ==> ignore
@@ -191,7 +230,7 @@ events:
       - "C:/Strawberry/c/share/cmake-3.29/Modules/Internal/CMakeDetermineLinkerId.cmake:40 (message)"
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake:207 (cmake_determine_linker_id)"
       - "C:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
-      - "CMakeLists.txt:6 (project)"
+      - "CMakeLists.txt:2 (project)"
     message: |
       Running the C compiler's linker: "C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/ld.lld" "-v"
       LLD 20.1.7 (https://github.com/llvm/llvm-project.git 6146a88f60492b520a36f8f8f3231e15f3cc6082) (compatible with GNU linkers)

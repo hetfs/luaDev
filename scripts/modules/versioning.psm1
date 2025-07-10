@@ -1,6 +1,12 @@
-# versioning.psm1 - Enhanced version handling
+# versioning.psm1 - Enhanced version handling with aliases
+
 $script:SupportedLuaVersions    = @("5.1", "5.2", "5.3", "5.4")
 $script:SupportedLuaJITVersions = @("2.0", "2.1")
+
+# 🛡️ Fallback logging
+if (-not (Get-Command Write-WarningLog -ErrorAction SilentlyContinue)) {
+    function Write-WarningLog { param($msg) Write-Host "[WARN] $msg" -ForegroundColor Yellow }
+}
 
 function Get-LatestEngineVersions {
     <#
@@ -24,16 +30,12 @@ function Get-LatestEngineVersions {
                     Sort-Object { [System.Version]$_ } -Descending |
                     Select-Object -First 4
 
-                # Normalize versions
-                return $versions | ForEach-Object {
-                    Convert-VersionShorthand -InputVersion $_
-                }
+                return $versions | ForEach-Object { Convert-VersionShorthand -InputVersion $_ }
             } catch {
-                Write-WarningLog "⚠️ Could not fetch from lua.org — using offline fallback"
+                Write-WarningLog "⚠️ Could not fetch versions from lua.org — using fallback"
                 return @("5.4.8", "5.3.6", "5.2.4", "5.1.5")
             }
         }
-
         "luajit" {
             return @("2.1.0-beta3", "2.0.5")
         }
@@ -43,9 +45,7 @@ function Get-LatestEngineVersions {
 function Convert-VersionShorthand {
     <#
     .SYNOPSIS
-        Normalizes shorthand versions like 540 or 54 to 5.4.0.
-    .PARAMETER InputVersion
-        Raw version input from user or manifest
+        Converts shorthand versions like 54 or 540 to 5.4.0
     #>
     param (
         [string]$InputVersion
@@ -69,11 +69,7 @@ function Convert-VersionShorthand {
 function Test-IsSupportedVersion {
     <#
     .SYNOPSIS
-        Determines if a version is supported by luaDev.
-    .PARAMETER Engine
-        lua or luajit
-    .PARAMETER Version
-        Semantic version (e.g., 5.4.8 or 2.1.0-beta3)
+        Validates if the version is supported
     #>
     param (
         [Parameter(Mandatory)][ValidateSet("lua", "luajit")]
@@ -91,4 +87,45 @@ function Test-IsSupportedVersion {
     }
 }
 
-Export-ModuleMember -Function Get-LatestEngineVersions, Convert-VersionShorthand, Test-IsSupportedVersion
+function Resolve-EngineVersions {
+    <#
+    .SYNOPSIS
+        Expands version aliases like 'latest', 'all', or specific versions.
+    .EXAMPLE
+        Resolve-EngineVersions -Engine lua -Versions @('latest', '5.3.6')
+    #>
+    param (
+        [Parameter(Mandatory)][ValidateSet("lua", "luajit")]
+        [string]$Engine,
+
+        [Parameter(Mandatory)]
+        [string[]]$Versions
+    )
+
+    $resolved = @()
+
+    foreach ($ver in $Versions) {
+        switch ($ver.ToLower()) {
+            "latest" {
+                $resolved += (Get-LatestEngineVersions -Engine $Engine)[0]
+            }
+            "stable" {
+                $resolved += (Get-LatestEngineVersions -Engine $Engine)[0]
+            }
+            "all" {
+                $resolved += (Get-LatestEngineVersions -Engine $Engine)
+            }
+            default {
+                $resolved += Convert-VersionShorthand -InputVersion $ver
+            }
+        }
+    }
+
+    return $resolved | Sort-Object -Unique
+}
+
+Export-ModuleMember -Function `
+    Get-LatestEngineVersions, `
+    Convert-VersionShorthand, `
+    Test-IsSupportedVersion, `
+    Resolve-EngineVersions

@@ -1,4 +1,5 @@
-# logging.psm1 - Fixed log level handling
+# logging.psm1 - Enhanced structured logging with color-coded levels
+
 $script:LogLevels = @{
     Silent  = 0
     Error   = 1
@@ -29,36 +30,41 @@ function Set-LogLevel {
 }
 
 function Write-LogInternal {
-    param($Level, $Message)
-    $prefix = switch($Level) {
-        "DEBUG"   { "[DEBUG]"; $fg = "DarkGray" }
-        "VERBOSE" { "[VERBOSE]"; $fg = "Gray" }
-        "INFO"    { "[INFO]"; $fg = "Cyan" }
-        "WARN"    { "[WARN]"; $fg = "Yellow" }
-        "ERROR"   { "[ERROR]"; $fg = "Red" }
-        default   { "[$Level]"; $fg = "White" }
+    param(
+        [string]$Level,
+        [string]$Message
+    )
+
+    $prefix = "[$Level]"
+    $fg = "White"
+
+    switch ($Level.ToUpper()) {
+        "DEBUG"   { $prefix = "[DEBUG]";   $fg = "DarkGray" }
+        "VERBOSE" { $prefix = "[VERBOSE]"; $fg = "Gray"     }
+        "INFO"    { $prefix = "[INFO]";    $fg = "Cyan"     }
+        "WARN"    { $prefix = "[WARN]";    $fg = "Yellow"   }
+        "ERROR"   { $prefix = "[ERROR]";   $fg = "Red"      }
     }
 
     $fullMessage = "$prefix $Message"
-    $levelValue = $script:LogLevels[$Level]
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    # Always write to file if initialized
+    # Always write to log file if available
     if ($script:LogFile) {
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        "$timestamp $fullMessage" | Out-File $script:LogFile -Append -Encoding UTF8
+        "$timestamp $fullMessage" | Out-File -FilePath $script:LogFile -Append -Encoding UTF8
     }
 
-    # Write to console based on log level
-    if ($levelValue -le $script:CurrentLogLevel) {
+    # Check level threshold before writing to console
+    if ($script:LogLevels.ContainsKey($Level) -and ($script:LogLevels[$Level] -le $script:CurrentLogLevel)) {
         Write-Host $fullMessage -ForegroundColor $fg
     }
 }
 
-function Write-InfoLog($msg)    { Write-LogInternal "INFO" $msg }
-function Write-WarningLog($msg) { Write-LogInternal "WARN" $msg }
-function Write-ErrorLog($msg)   { Write-LogInternal "ERROR" $msg }
-function Write-VerboseLog($msg) { Write-LogInternal "VERBOSE" $msg }
-function Write-DebugLog($msg)   { Write-LogInternal "DEBUG" $msg }
+function Write-InfoLog    { param($msg) Write-LogInternal "Info"    $msg }
+function Write-WarningLog { param($msg) Write-LogInternal "Warn"    $msg }
+function Write-ErrorLog   { param($msg) Write-LogInternal "Error"   $msg }
+function Write-VerboseLog { param($msg) Write-LogInternal "Verbose" $msg }
+function Write-DebugLog   { param($msg) Write-LogInternal "Debug"   $msg }
 
 Export-ModuleMember -Function Initialize-Logging, Set-LogLevel, `
     Write-InfoLog, Write-WarningLog, Write-ErrorLog, `

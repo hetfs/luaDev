@@ -1,52 +1,52 @@
-# downloader.psm1 - Robust downloader with mirror support and enhanced diagnostics
+# downloader.psm1 - Updated for dynamic CMake generation
+
 function Get-SourceArchive {
     <#
     .SYNOPSIS
-        Downloads and extracts Lua/LuaJIT source with mirror fallback and better diagnostics
+        Downloads and extracts Lua/LuaJIT source with mirror fallback.
     .PARAMETER Engine
         'lua' or 'luajit'
     .PARAMETER Version
         Semantic version (e.g. 5.4.8 or 2.1.0-beta3)
     #>
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)][ValidateSet("lua", "luajit")]
         [string]$Engine,
 
-        [Parameter(Mandatory)][string]$Version
+        [Parameter(Mandatory)][string]
+        $Version
     )
 
     $sourcesRoot = Get-SourcesRoot
+    Write-VerboseLog "📁 Sources root: $sourcesRoot"
+
     $name        = "$Engine-$Version"
     $tarball     = "$name.tar.gz"
     $archivePath = Join-Path $sourcesRoot $tarball
     $extractPath = Join-Path $sourcesRoot $name
-    $checkFile   = if ($Engine -eq "lua") {
+
+    $checkFile = if ($Engine -eq "lua") {
         Join-Path $extractPath "src/lua.c"
     } else {
         Join-Path $extractPath "src/luajit.c"
     }
 
-    $cmakePath   = Join-Path $extractPath "CMakeLists.txt"
-
-    # ♻️ Reuse already-extracted source
+    # ♻️ Return existing extracted source if valid
     if (Test-Path $checkFile) {
         Write-InfoLog "♻️ Using cached $Engine $Version source"
         return $extractPath
     }
 
-    # 🌍 Define mirrors with fallback options
+    # 🌍 Define source URLs
     $mirrors = @()
     if ($Engine -eq "lua") {
-        $mirrors = @(
-            "https://www.lua.org/ftp/lua-$Version.tar.gz"
-        )
+        $mirrors += "https://www.lua.org/ftp/lua-$Version.tar.gz"
     } else {
-        $mirrors = @(
-            "https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$Version.tar.gz"
-        )
+        $mirrors += "https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$Version.tar.gz"
     }
 
-    # 📥 Download from mirrors with retry logic
+    # 📥 Attempt downloads
     $maxRetries = 3
     $downloaded = $false
     $lastError = $null
@@ -56,31 +56,20 @@ function Get-SourceArchive {
             try {
                 Write-InfoLog "⬇️ Downloading $Engine $Version from [$url] (attempt $i/$maxRetries)"
 
-                # Use TLS 1.2+ for secure connections
                 [Net.ServicePointManager]::SecurityProtocol =
                     [Net.SecurityProtocolType]::Tls12 -bor
                     [Net.SecurityProtocolType]::Tls11 -bor
                     [Net.SecurityProtocolType]::Tls
 
-                # Modern download method
                 Invoke-WebRequest -Uri $url -OutFile $archivePath -UseBasicParsing -TimeoutSec 30
+                Write-InfoLog "✅ Download completed from: $url"
                 $downloaded = $true
-                Write-InfoLog "✅ Download completed successfully from $url"
                 break
             }
             catch {
                 $lastError = $_.Exception.Message
-                Write-WarningLog "⚠️ Download attempt $i failed: $lastError"
-
-                # DNS-specific error handling
-                if ($lastError -match "No such host is known") {
-                    Write-VerboseLog "🔍 DNS resolution failed for $($url.Split('/')[2])"
-                }
-
-                # Sleep with exponential backoff
-                $sleepSeconds = [Math]::Pow(2, $i)  # 2, 4, 8 seconds
-                Write-VerboseLog "⏳ Retrying in $sleepSeconds seconds..."
-                Start-Sleep -Seconds $sleepSeconds
+                Write-WarningLog "⚠️ Attempt $i failed: $lastError"
+                Start-Sleep -Seconds ([Math]::Pow(2, $i))  # backoff: 2, 4, 8
             }
         }
 
@@ -92,62 +81,40 @@ function Get-SourceArchive {
         return $null
     }
 
-    # 📦 Extract archive with robust validation
-    $maxExtractAttempts = 2
+    # 📦 Extraction
     $extracted = $false
-
-    for ($j = 1; $j -le $maxExtractAttempts; $j++) {
+    for ($j = 1; $j -le 2; $j++) {
         try {
-            Write-InfoLog "📦 Extracting $tarball (attempt $j/$maxExtractAttempts)"
-
-            # Use native tar command if available
+            Write-InfoLog "📦 Extracting $tarball (attempt $j/2)"
             if (Get-Command tar -ErrorAction SilentlyContinue) {
                 tar xzf $archivePath -C $sourcesRoot
             }
+            elseif (Test-Path "$env:ProgramFiles\7-Zip\7z.exe") {
+                & "$env:ProgramFiles\7-Zip\7z.exe" x $archivePath -o$sourcesRoot
+            }
             else {
-                # Fallback to 7-Zip if available
-                $7zPath = "$env:ProgramFiles\7-Zip\7z.exe"
-                if (Test-Path $7zPath) {
-                    & $7zPath x $archivePath -o$sourcesRoot
-                }
-                else {
-                    throw "No extraction method available (tar or 7-Zip not found)"
-                }
+                throw "No tar or 7-Zip found for extraction"
             }
 
-            # Verify extraction
             if (-not (Test-Path $checkFile)) {
-                throw "Extraction failed - critical file missing: $($checkFile | Split-Path -Leaf)"
+                throw "Critical file missing after extract: $($checkFile | Split-Path -Leaf)"
             }
 
             $extracted = $true
             break
         }
         catch {
-            Write-WarningLog "⚠️ Extraction attempt $j failed: $($_.Exception.Message)"
+            Write-WarningLog "⚠️ Extract attempt $j failed: $($_.Exception.Message)"
             Start-Sleep -Seconds (3 * $j)
         }
     }
 
     if (-not $extracted) {
-        Write-ErrorLog "❌ All extraction attempts failed"
+        Write-ErrorLog "❌ Extraction failed after 2 attempts"
         return $null
     }
 
-    # 🧩 Inject fallback CMakeLists.txt if missing
-    if (-not (Test-Path $cmakePath)) {
-        $templateName = if ($Engine -eq "lua") { "CMakeLists.lua.txt" } else { "CMakeLists.luajit.txt" }
-        $template     = Join-Path (Get-TemplatesRoot) "cmake\$templateName"
-
-        if (Test-Path $template) {
-            Copy-Item -Path $template -Destination $cmakePath -Force
-            Write-InfoLog "🧩 Injected fallback template: $templateName"
-        }
-        else {
-            Write-WarningLog "⚠️ No fallback template found for $Engine"
-        }
-    }
-
+    Write-InfoLog "✅ Extraction complete: $extractPath"
     return $extractPath
 }
 

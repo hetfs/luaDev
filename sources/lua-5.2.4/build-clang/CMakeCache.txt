@@ -14,17 +14,41 @@
 # EXTERNAL cache entries
 ########################
 
-//Build shared library
+//Build shared libraries
 BUILD_SHARED_LIBS:BOOL=OFF
-
-//Build standalone interpreter
-BUILD_STANDALONE:BOOL=ON
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/llvm-addr2line.exe
 
 //Path to a program.
 CMAKE_AR:FILEPATH=C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/llvm-ar.exe
+
+//ASM compiler
+CMAKE_ASM_COMPILER:FILEPATH=C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/clang.exe
+
+//LLVM archiver
+CMAKE_ASM_COMPILER_AR:FILEPATH=C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/llvm-ar.exe
+
+//`clang-scan-deps` dependency scanner
+CMAKE_ASM_COMPILER_CLANG_SCAN_DEPS:FILEPATH=C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/clang-scan-deps.exe
+
+//Generate index for LLVM archive
+CMAKE_ASM_COMPILER_RANLIB:FILEPATH=C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/llvm-ranlib.exe
+
+//Flags used by the ASM compiler during all build types.
+CMAKE_ASM_FLAGS:STRING=
+
+//Flags used by the ASM compiler during DEBUG builds.
+CMAKE_ASM_FLAGS_DEBUG:STRING=-g
+
+//Flags used by the ASM compiler during MINSIZEREL builds.
+CMAKE_ASM_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
+
+//Flags used by the ASM compiler during RELEASE builds.
+CMAKE_ASM_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
+
+//Flags used by the ASM compiler during RELWITHDEBINFO builds.
+CMAKE_ASM_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
@@ -124,7 +148,7 @@ CMAKE_INSTALL_MANDIR:PATH=
 CMAKE_INSTALL_OLDINCLUDEDIR:PATH=/usr/include
 
 //Install path prefix, prepended onto install directories.
-CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/lua
+CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/luajit
 
 //Run-time variable data (LOCALSTATEDIR/run)
 CMAKE_INSTALL_RUNSTATEDIR:PATH=
@@ -180,22 +204,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=lua
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION:STATIC=5.2.4
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_MAJOR:STATIC=5
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_MINOR:STATIC=2
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_PATCH:STATIC=4
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_TWEAK:STATIC=
+CMAKE_PROJECT_NAME:STATIC=luajit
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=C:/Users/Fredaws/AppData/Local/Microsoft/WinGet/Packages/MartinStorsjo.LLVM-MinGW.MSVCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/llvm-mingw-20250613-msvcrt-x86_64/bin/llvm-ranlib.exe
@@ -280,17 +289,14 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
-//Lua engine type
-LUA_ENGINE:STRING=lua
+//Value Computed by CMake
+luajit_BINARY_DIR:STATIC=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang
 
 //Value Computed by CMake
-lua_BINARY_DIR:STATIC=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang
+luajit_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-lua_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-lua_SOURCE_DIR:STATIC=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4
+luajit_SOURCE_DIR:STATIC=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4
 
 
 ########################
@@ -301,6 +307,25 @@ lua_SOURCE_DIR:STATIC=D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER
+CMAKE_ASM_COMPILER-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER_AR
+CMAKE_ASM_COMPILER_AR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER_CLANG_SCAN_DEPS
+CMAKE_ASM_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER_RANLIB
+CMAKE_ASM_COMPILER_RANLIB-ADVANCED:INTERNAL=1
+CMAKE_ASM_COMPILER_WORKS:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS
+CMAKE_ASM_FLAGS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_DEBUG
+CMAKE_ASM_FLAGS_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_MINSIZEREL
+CMAKE_ASM_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_RELEASE
+CMAKE_ASM_FLAGS_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_RELWITHDEBINFO
+CMAKE_ASM_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created
 CMAKE_CACHEFILE_DIR:INTERNAL=d:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.2.4/build-clang
 //Major version of cmake used to create the current loaded cache
@@ -472,5 +497,5 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 //CMAKE_INSTALL_PREFIX during last run
-_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Program Files (x86)/lua
+_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Program Files (x86)/luajit
 

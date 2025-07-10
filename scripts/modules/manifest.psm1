@@ -1,23 +1,41 @@
-# manifest.psm1
-# 🧾 Exports structured JSON + Markdown manifest of Lua builds
-# Usage Example:
-# Export-LuaBuildManifest -Artifacts $artifactList -DryRun
-
 function Export-LuaBuildManifest {
+    <#
+    .SYNOPSIS
+        Exports structured JSON + Markdown manifest of Lua builds.
+
+    .PARAMETER Artifacts
+        The build metadata to include in the manifest.
+
+    .PARAMETER DefaultArchitecture
+        Optional fallback architecture if none is provided per build.
+
+    .PARAMETER OutputPath
+        Optional override path to store manifest files (defaults to /manifests).
+
+    .PARAMETER DryRun
+        Simulates export without writing to disk.
+    #>
     param(
         [Parameter(Mandatory)][array]$Artifacts,
         [string]$DefaultArchitecture,
+        [string]$OutputPath,
         [switch]$DryRun
     )
 
-    # 🔁 Get system info
     $osInfo = Get-OSPlatform
     if (-not $DefaultArchitecture) {
         $DefaultArchitecture = $osInfo.Architecture
     }
 
     $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
-    $manifestsRoot = Get-ManifestsRoot
+
+    # 🗂️ Set output root (custom or default)
+    $manifestsRoot = if ($OutputPath) { $OutputPath } else { Get-ManifestsRoot }
+
+    if (-not $DryRun -and -not (Test-Path $manifestsRoot)) {
+        New-Item -ItemType Directory -Path $manifestsRoot -Force | Out-Null
+    }
+
     $jsonPath = Join-Path $manifestsRoot "manifest.json"
     $mdPath   = Join-Path $manifestsRoot "manifest.md"
 
@@ -43,7 +61,6 @@ function Export-LuaBuildManifest {
         Artifacts = $manifestArtifacts
     }
 
-    # 💾 Save JSON
     if (-not $DryRun) {
         $manifest | ConvertTo-Json -Depth 10 | Set-Content -Path $jsonPath -Encoding UTF8
         Write-InfoLog "📄 JSON manifest exported: $jsonPath"

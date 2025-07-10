@@ -1,115 +1,111 @@
-# luajitBuilder.psm1 - Enhanced LuaJIT build module
+# luajitBuilder.psm1
 
 function Build-LuaJIT {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)][string]$Version,
         [Parameter(Mandatory)][string]$SourcePath,
         [ValidateSet("static", "shared")][string]$BuildType = "static",
-        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang"
+        [ValidateSet("msvc", "mingw", "clang")][string]$Compiler = "clang",
+        [switch]$PreviewOnly
     )
+
+    $Engine = "luajit"
 
     try {
         # 1. Generate CMakeLists.txt
-        if (-not (Generate-CMakeLists -Engine "luajit" -Version $Version -SourcePath $SourcePath -BuildType $BuildType)) {
-            throw "CMakeLists generation failed"
+        $result = Generate-CMakeLists -Engine $Engine -Version $Version `
+            -SourcePath $SourcePath -BuildType $BuildType -Compiler $Compiler `
+            -PreviewOnly:$PreviewOnly
+
+        if (-not $result) {
+            throw "CMakeLists generation failed for LuaJIT $Version"
+        }
+
+        if ($PreviewOnly) {
+            return $true
         }
 
         # 2. Prepare build directory
         $buildDir = Join-Path $SourcePath "build-$Compiler"
         if (Test-Path $buildDir) {
-            Remove-Item $buildDir -Recurse -Force -ErrorAction Stop
+            Remove-Item -Path $buildDir -Recurse -Force -ErrorAction Stop
         }
         New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 
         # 3. Configure CMake arguments
-        $cmakeArgs = @(
-            "-DCMAKE_BUILD_TYPE=Release",
-            "-DLUAJIT_VERSION=$Version"
-        )
-
-        # Add platform-specific flags
-        if ($IsWindows) {
-            $cmakeArgs += "-DTARGET_SYS=Windows"
-        } elseif ($IsMacOS) {
-            $cmakeArgs += "-DTARGET_SYS=Darwin"
-        } else {
-            $cmakeArgs += "-DTARGET_SYS=Linux"
-        }
-
-        # Add compiler-specific flags
+        $cmakeArgs = @("-DCMAKE_BUILD_TYPE=Release")
         switch ($Compiler) {
             "clang" {
                 $cmakeArgs += "-DCMAKE_C_COMPILER=clang"
-                $cmakeArgs += "-DCMAKE_ASM_COMPILER=clang"
             }
             "mingw" {
                 $cmakeArgs += "-G", "MinGW Makefiles"
                 $cmakeArgs += "-DCMAKE_C_COMPILER=gcc"
             }
-            "msvc"  {
+            "msvc" {
                 $cmakeArgs += "-A", "x64"
                 $cmakeArgs += "-T", "host=x64"
             }
         }
 
-        # 4. Build process
+        # 4. Configure and build
         Push-Location $buildDir
         try {
-            Write-InfoLog "🛠️ Configuring LuaJIT $Version with $Compiler"
+            Write-InfoLog "🛠️ Configuring CMake for LuaJIT $Version ($Compiler)"
             & cmake $SourcePath @cmakeArgs
             if ($LASTEXITCODE -ne 0) {
                 throw "CMake configuration failed (exit $LASTEXITCODE)"
             }
 
-            Write-InfoLog "🏗️ Building LuaJIT $Version ($BuildType)"
-            $buildCommand = "cmake --build . --config Release --parallel"
-            Invoke-Expression $buildCommand
+            Write-InfoLog "🏗️ Building LuaJIT $Version with $Compiler ($BuildType)..."
+            & cmake --build . --config Release --parallel
             if ($LASTEXITCODE -ne 0) {
                 throw "Build failed (exit $LASTEXITCODE)"
             }
 
-            # 5. Artifact collection
-            $artifactDir = Get-ArtifactPath -Engine "luajit" -Version $Version -BuildType $BuildType -Compiler $Compiler -Create
+            # 5. Prepare artifact directory
+            $artifactDir = Get-ArtifactPath -Engine $Engine -Version $Version `
+                -BuildType $BuildType -Compiler $Compiler
 
-            # Copy binaries from multiple locations
-            $copyPaths = @("$buildDir/bin", "$buildDir/lib", $buildDir)
-            $patterns = @("luajit*", "lua51*", "libluajit*")
+            if (-not (Test-Path $artifactDir)) {
+                New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null
+            }
 
-            $copiedCount = 0
-            foreach ($path in $copyPaths) {
-                if (Test-Path $path) {
-                    foreach ($pattern in $patterns) {
-                        $binaries = Get-ChildItem -Path $path -Recurse -Include $pattern -ErrorAction SilentlyContinue
-                        foreach ($file in $binaries) {
-                            # Skip directories and headers
-                            if ($file.PSIsContainer -or $file.Extension -eq ".h") { continue }
+            # 6. Copy artifacts
+            $binDir = if (Test-Path "$buildDir/bin") { "$buildDir/bin" } else { $buildDir }
+            $libDir = if (Test-Path "$buildDir/lib") { "$buildDir/lib" } else { $buildDir }
 
-                            $destPath = Join-Path $artifactDir $file.Name
-                            Copy-Item -Path $file.FullName -Destination $destPath -Force
-                            $copiedCount++
-                            Write-VerboseLog "📦 Copied: $($file.Name)"
-                        }
-                    }
+            $patterns = @("luajit*", "*.a", "*.lib", "*.dll", "*.so", "*.dylib")
+            $copied = 0
+            foreach ($pattern in $patterns) {
+                $files = Get-ChildItem -Path $binDir, $libDir -Recurse -Include $pattern -ErrorAction SilentlyContinue
+                foreach ($file in $files) {
+                    if ($file.PSIsContainer -or $file.Extension -eq ".h") { continue }
+                    $dest = Join-Path $artifactDir $file.Name
+                    Copy-Item -Path $file.FullName -Destination $dest -Force
+                    Write-VerboseLog "📦 Copied: $($file.Name)"
+                    $copied++
                 }
             }
 
-            # Copy headers for development
+            if ($copied -eq 0) {
+                throw "No binaries copied from build output"
+            }
+
+            # 7. Copy headers
             $headers = Get-ChildItem -Path $SourcePath -Recurse -Include "*.h"
-            foreach ($header in $headers) {
-                $destPath = Join-Path $artifactDir $header.Name
-                Copy-Item -Path $header.FullName -Destination $destPath -Force
-                Write-VerboseLog "📄 Copied header: $($header.Name)"
+            foreach ($h in $headers) {
+                $dest = Join-Path $artifactDir $h.Name
+                Copy-Item -Path $h.FullName -Destination $dest -Force
+                Write-VerboseLog "📄 Copied header: $($h.Name)"
             }
 
-            if ($copiedCount -eq 0) {
-                throw "No binaries copied from build directory"
-            }
-
-            Write-InfoLog "✅ LuaJIT $Version build successful - $copiedCount artifacts saved to: $artifactDir"
+            Write-InfoLog "✅ LuaJIT $Version build successful - $copied artifacts saved to: $artifactDir"
             return $true
         }
         catch {
-            Write-ErrorLog "❌ Build phase failed: $($_.Exception.Message)"
+            Write-ErrorLog "❌ LuaJIT build failed: $($_.Exception.Message)"
             return $false
         }
         finally {

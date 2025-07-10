@@ -1,4 +1,16 @@
 # loader.psm1 - Enhanced module loader with dependency tracking
+
+# 🛡️ Fallback logging
+if (-not (Get-Command Write-WarningLog -ErrorAction SilentlyContinue)) {
+    function Write-WarningLog  { param($msg) Write-Host "[WARN] $msg" -ForegroundColor Yellow }
+}
+if (-not (Get-Command Write-InfoLog -ErrorAction SilentlyContinue)) {
+    function Write-InfoLog     { param($msg) Write-Host "[INFO] $msg" -ForegroundColor Cyan }
+}
+if (-not (Get-Command Write-ErrorLog -ErrorAction SilentlyContinue)) {
+    function Write-ErrorLog    { param($msg) Write-Host "[ERROR] $msg" -ForegroundColor Red }
+}
+
 function Import-LuaDevModules {
     param (
         [Parameter(Mandatory)][string]$ModulesPath,
@@ -9,96 +21,90 @@ function Import-LuaDevModules {
         throw "Modules path not found: $ModulesPath"
     }
 
-    # 🔒 Strict module load order with dependency tracking
+    # 🔒 Strict load order for dependency resolution
     $loadOrder = @(
-        "globals.psm1",        # 🌐 Path helpers (must come first)
-        "environment.psm1",    # 🧭 OS detection
-        "versioning.psm1",     # 🔢 Version parsing
-        "logging.psm1",        # 📢 Logging functions
-        "downloader.psm1",     # ⬇️ Source fetching
-        "cmake.psm1",          # 🛠️ CMake config
-        "luaBuilder.psm1",     # 🔧 Lua build
-        "luajitBuilder.psm1",  # 🔧 LuaJIT build
-        "manifest.psm1",       # 🧾 Artifact tracking
-        "export.psm1",         # 📝 Markdown export
-        "logexporter.psm1"     # 📋 Docs export
+        "globals.psm1",            # 🌐 Path helpers
+        "environment.psm1",        # 🧱 OS detection
+        "versioning.psm1",         # 📂 Version parsing
+        "logging.psm1",            # 📢 Logging functions
+        "downloader.psm1",         # ⬇️ Source fetching
+        "cmake.psm1",              # 🛠️ CMake config
+        "luaBuilder.psm1",         # 🔧 Lua build
+        "luajitBuilder.psm1",      # 🔧 LuaJIT build
+        "manifest.psm1",           # 🧾 Artifact manifesting
+        "logExporter.psm1",        # 📜 Markdown log
+        "manifestsExporter.psm1"   # 📋 Export to docs/manifest markdown
     )
 
     $global:loadedModules = [System.Collections.Generic.List[string]]::new()
     $global:loadedModuleNames = [System.Collections.Generic.List[string]]::new()
 
-    Write-Verbose "  [Loader] 🔍 Loading modules from: $ModulesPath"
-    Write-Verbose "  [Loader] 📋 Load order: $($loadOrder -join ', ')"
+    Write-Verbose "  [Loader] 🔍 Scanning modules from: $ModulesPath"
+    Write-Verbose "  [Loader] 📋 Defined load order: $($loadOrder -join ', ')"
 
     foreach ($module in $loadOrder) {
         $fullPath = Join-Path $ModulesPath $module
         if (Test-Path $fullPath) {
             try {
-                # Get module name without extension
                 $moduleName = [System.IO.Path]::GetFileNameWithoutExtension($module)
-
-                # Skip if already loaded
                 if ($global:loadedModuleNames -contains $moduleName) {
-                    Write-Verbose "  [Loader] ⏩ $moduleName already loaded"
+                    Write-Verbose "  [Loader] ⏭️  Skipping already-loaded module: $moduleName"
                     continue
                 }
 
-                # Load the module
-                Write-Verbose "  [Loader] 🔄 Loading $moduleName..."
                 Import-Module -Name $fullPath -Force -DisableNameChecking -Scope Global -ErrorAction Stop
-
                 $global:loadedModules.Add($module)
                 $global:loadedModuleNames.Add($moduleName)
-                Write-Verbose "  [Loader] ✅ Loaded $moduleName"
+                Write-Verbose "  [Loader] ✅ Loaded module: $moduleName"
             }
             catch {
-                Write-Warning "  [Loader] ❌ Failed to load $module - $($_.Exception.Message)"
+                Write-WarningLog "  [Loader] ❌ Failed to load `${module}`: $($_.Exception.Message)"
             }
         }
         else {
-            Write-Warning "  [Loader] ⚠️ Module file not found: $fullPath"
+            Write-WarningLog "  [Loader] ⚠️ Module not found: $fullPath"
         }
     }
 
-    # 🔁 Fallback loading for any missing modules
+    # 🔁 Load any missing modules in fallback mode
     if ($AllowFallback) {
-        Write-Verbose "  [Loader] 🔁 Starting fallback module loading..."
+        Write-Verbose "  [Loader] 🔁 Fallback loading enabled..."
         Get-ChildItem -Path $ModulesPath -Filter *.psm1 | ForEach-Object {
             $moduleName = $_.BaseName
             if ($global:loadedModuleNames -notcontains $moduleName) {
                 try {
-                    Write-Verbose "  [Loader] 🔄 Loading fallback: $moduleName..."
                     Import-Module -Name $_.FullName -Force -DisableNameChecking -Scope Global
                     $global:loadedModules.Add($_.Name)
                     $global:loadedModuleNames.Add($moduleName)
                     Write-Verbose "  [Loader] ✅ Fallback loaded: $moduleName"
                 }
                 catch {
-                    Write-Warning "  [Loader] ❌ Fallback failed: $($_.Name) - $($_.Exception.Message)"
+                    Write-WarningLog "  [Loader] ❌ Fallback failed: $($_.Name) - $($_.Exception.Message)"
                 }
             }
         }
     }
 
-    # 🔍 Critical module validation
-    $criticalModules = @{
+    # 🧩 Validate critical function availability
+    $criticalFunctions = @{
         "environment" = "Get-OSPlatform"
-        "cmake"      = "Generate-CMakeLists"
-        "downloader" = "Get-SourceArchive"
+        "cmake"       = "Generate-CMakeLists"
+        "downloader"  = "Get-SourceArchive"
     }
 
-    $missingCritical = @()
-    foreach ($mod in $criticalModules.Keys) {
-        if ($global:loadedModuleNames -notcontains $mod) {
-            $missingCritical += $mod
+    $missing = @()
+    foreach ($module in $criticalFunctions.Keys) {
+        $func = $criticalFunctions[$module]
+        if (-not (Get-Command $func -ErrorAction SilentlyContinue)) {
+            $missing += "$module (missing $func)"
         }
     }
 
-    if ($missingCritical) {
-        throw "Critical modules missing: $($missingCritical -join ', ') (requires $($criticalModules[$missingCritical] -join ', '))"
+    if ($missing.Count -gt 0) {
+        throw "❌ Critical module functions missing: $($missing -join ', ')"
     }
 
-    Write-Verbose "  [Loader] 🎯 Successfully loaded $($global:loadedModuleNames.Count) modules"
+    Write-Verbose "  [Loader] 🌟 Loaded $($global:loadedModuleNames.Count) modules successfully"
     Write-Verbose "  [Loader] 📦 Modules loaded: $($global:loadedModuleNames -join ', ')"
 }
 

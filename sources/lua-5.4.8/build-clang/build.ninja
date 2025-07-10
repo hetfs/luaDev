@@ -11,7 +11,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: lua
+# Project: luajit
 # Configurations: Release
 # =============================================================================
 
@@ -57,7 +57,7 @@ build CMakeFiles/lua.dir/src/lapi.c.obj: C_COMPILER__lua_unscanned_Release D$:/H
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lauxlib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lauxlib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -67,7 +67,7 @@ build CMakeFiles/lua.dir/src/lauxlib.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lbaselib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lbaselib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -77,7 +77,7 @@ build CMakeFiles/lua.dir/src/lbaselib.c.obj: C_COMPILER__lua_unscanned_Release D
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lcode.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lcode.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -87,7 +87,7 @@ build CMakeFiles/lua.dir/src/lcode.c.obj: C_COMPILER__lua_unscanned_Release D$:/
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lcorolib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lcorolib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -97,7 +97,7 @@ build CMakeFiles/lua.dir/src/lcorolib.c.obj: C_COMPILER__lua_unscanned_Release D
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lctype.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lctype.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -107,7 +107,7 @@ build CMakeFiles/lua.dir/src/lctype.c.obj: C_COMPILER__lua_unscanned_Release D$:
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/ldblib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/ldblib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -117,7 +117,7 @@ build CMakeFiles/lua.dir/src/ldblib.c.obj: C_COMPILER__lua_unscanned_Release D$:
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/ldebug.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/ldebug.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -127,7 +127,7 @@ build CMakeFiles/lua.dir/src/ldebug.c.obj: C_COMPILER__lua_unscanned_Release D$:
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/ldo.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/ldo.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -137,7 +137,7 @@ build CMakeFiles/lua.dir/src/ldo.c.obj: C_COMPILER__lua_unscanned_Release D$:/HE
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/ldump.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/ldump.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -147,7 +147,7 @@ build CMakeFiles/lua.dir/src/ldump.c.obj: C_COMPILER__lua_unscanned_Release D$:/
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lfunc.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lfunc.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -157,7 +157,7 @@ build CMakeFiles/lua.dir/src/lfunc.c.obj: C_COMPILER__lua_unscanned_Release D$:/
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lgc.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lgc.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -167,7 +167,7 @@ build CMakeFiles/lua.dir/src/lgc.c.obj: C_COMPILER__lua_unscanned_Release D$:/HE
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/linit.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/linit.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -177,7 +177,7 @@ build CMakeFiles/lua.dir/src/linit.c.obj: C_COMPILER__lua_unscanned_Release D$:/
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/liolib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/liolib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -187,7 +187,7 @@ build CMakeFiles/lua.dir/src/liolib.c.obj: C_COMPILER__lua_unscanned_Release D$:
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/llex.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/llex.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -197,7 +197,7 @@ build CMakeFiles/lua.dir/src/llex.c.obj: C_COMPILER__lua_unscanned_Release D$:/H
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lmathlib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lmathlib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -207,7 +207,7 @@ build CMakeFiles/lua.dir/src/lmathlib.c.obj: C_COMPILER__lua_unscanned_Release D
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lmem.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lmem.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -217,7 +217,7 @@ build CMakeFiles/lua.dir/src/lmem.c.obj: C_COMPILER__lua_unscanned_Release D$:/H
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/loadlib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/loadlib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -227,7 +227,7 @@ build CMakeFiles/lua.dir/src/loadlib.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lobject.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lobject.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -237,7 +237,7 @@ build CMakeFiles/lua.dir/src/lobject.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lopcodes.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lopcodes.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -247,7 +247,7 @@ build CMakeFiles/lua.dir/src/lopcodes.c.obj: C_COMPILER__lua_unscanned_Release D
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/loslib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/loslib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -257,7 +257,7 @@ build CMakeFiles/lua.dir/src/loslib.c.obj: C_COMPILER__lua_unscanned_Release D$:
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lparser.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lparser.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -267,7 +267,7 @@ build CMakeFiles/lua.dir/src/lparser.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lstate.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lstate.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -277,7 +277,7 @@ build CMakeFiles/lua.dir/src/lstate.c.obj: C_COMPILER__lua_unscanned_Release D$:
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lstring.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lstring.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -287,7 +287,7 @@ build CMakeFiles/lua.dir/src/lstring.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lstrlib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lstrlib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -297,7 +297,7 @@ build CMakeFiles/lua.dir/src/lstrlib.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/ltable.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/ltable.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -307,7 +307,7 @@ build CMakeFiles/lua.dir/src/ltable.c.obj: C_COMPILER__lua_unscanned_Release D$:
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/ltablib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/ltablib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -317,7 +317,7 @@ build CMakeFiles/lua.dir/src/ltablib.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/ltm.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/ltm.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -327,27 +327,7 @@ build CMakeFiles/lua.dir/src/ltm.c.obj: C_COMPILER__lua_unscanned_Release D$:/HE
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
-
-build CMakeFiles/lua.dir/src/lua.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lua.c || cmake_object_order_depends_target_lua
-  DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
-  DEP_FILE = CMakeFiles\lua.dir\src\lua.c.obj.d
-  FLAGS = -O3 -DNDEBUG -std=gnu99 -O3
-  INCLUDES = -ID:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src
-  OBJECT_DIR = CMakeFiles\lua.dir
-  OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
-
-build CMakeFiles/lua.dir/src/luac.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/luac.c || cmake_object_order_depends_target_lua
-  DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
-  DEP_FILE = CMakeFiles\lua.dir\src\luac.c.obj.d
-  FLAGS = -O3 -DNDEBUG -std=gnu99 -O3
-  INCLUDES = -ID:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src
-  OBJECT_DIR = CMakeFiles\lua.dir
-  OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lundump.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lundump.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -357,7 +337,7 @@ build CMakeFiles/lua.dir/src/lundump.c.obj: C_COMPILER__lua_unscanned_Release D$
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lutf8lib.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lutf8lib.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -367,7 +347,7 @@ build CMakeFiles/lua.dir/src/lutf8lib.c.obj: C_COMPILER__lua_unscanned_Release D
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lvm.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lvm.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -377,7 +357,7 @@ build CMakeFiles/lua.dir/src/lvm.c.obj: C_COMPILER__lua_unscanned_Release D$:/HE
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 build CMakeFiles/lua.dir/src/lzio.c.obj: C_COMPILER__lua_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lzio.c || cmake_object_order_depends_target_lua
   DEFINES = -DLUA_COMPAT_5_3 -DLUA_USE_APICHECK -DLUA_USE_TOBE_CLOSED -DLUA_USE_WINDOWS_ANSI -DLUA_USE_WINDOWS_UTF8
@@ -387,7 +367,7 @@ build CMakeFiles/lua.dir/src/lzio.c.obj: C_COMPILER__lua_unscanned_Release D$:/H
   OBJECT_DIR = CMakeFiles\lua.dir
   OBJECT_FILE_DIR = CMakeFiles\lua.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_PDB = liblua.pdb
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 
 # =============================================================================
@@ -395,53 +375,90 @@ build CMakeFiles/lua.dir/src/lzio.c.obj: C_COMPILER__lua_unscanned_Release D$:/H
 
 
 #############################################
-# Link the static library liblua.a
+# Link the static library lib\liblua-5.4.a
 
-build liblua.a: C_STATIC_LIBRARY_LINKER__lua_Release CMakeFiles/lua.dir/src/lapi.c.obj CMakeFiles/lua.dir/src/lauxlib.c.obj CMakeFiles/lua.dir/src/lbaselib.c.obj CMakeFiles/lua.dir/src/lcode.c.obj CMakeFiles/lua.dir/src/lcorolib.c.obj CMakeFiles/lua.dir/src/lctype.c.obj CMakeFiles/lua.dir/src/ldblib.c.obj CMakeFiles/lua.dir/src/ldebug.c.obj CMakeFiles/lua.dir/src/ldo.c.obj CMakeFiles/lua.dir/src/ldump.c.obj CMakeFiles/lua.dir/src/lfunc.c.obj CMakeFiles/lua.dir/src/lgc.c.obj CMakeFiles/lua.dir/src/linit.c.obj CMakeFiles/lua.dir/src/liolib.c.obj CMakeFiles/lua.dir/src/llex.c.obj CMakeFiles/lua.dir/src/lmathlib.c.obj CMakeFiles/lua.dir/src/lmem.c.obj CMakeFiles/lua.dir/src/loadlib.c.obj CMakeFiles/lua.dir/src/lobject.c.obj CMakeFiles/lua.dir/src/lopcodes.c.obj CMakeFiles/lua.dir/src/loslib.c.obj CMakeFiles/lua.dir/src/lparser.c.obj CMakeFiles/lua.dir/src/lstate.c.obj CMakeFiles/lua.dir/src/lstring.c.obj CMakeFiles/lua.dir/src/lstrlib.c.obj CMakeFiles/lua.dir/src/ltable.c.obj CMakeFiles/lua.dir/src/ltablib.c.obj CMakeFiles/lua.dir/src/ltm.c.obj CMakeFiles/lua.dir/src/lua.c.obj CMakeFiles/lua.dir/src/luac.c.obj CMakeFiles/lua.dir/src/lundump.c.obj CMakeFiles/lua.dir/src/lutf8lib.c.obj CMakeFiles/lua.dir/src/lvm.c.obj CMakeFiles/lua.dir/src/lzio.c.obj
+build lib/liblua-5.4.a: C_STATIC_LIBRARY_LINKER__lua_Release CMakeFiles/lua.dir/src/lapi.c.obj CMakeFiles/lua.dir/src/lauxlib.c.obj CMakeFiles/lua.dir/src/lbaselib.c.obj CMakeFiles/lua.dir/src/lcode.c.obj CMakeFiles/lua.dir/src/lcorolib.c.obj CMakeFiles/lua.dir/src/lctype.c.obj CMakeFiles/lua.dir/src/ldblib.c.obj CMakeFiles/lua.dir/src/ldebug.c.obj CMakeFiles/lua.dir/src/ldo.c.obj CMakeFiles/lua.dir/src/ldump.c.obj CMakeFiles/lua.dir/src/lfunc.c.obj CMakeFiles/lua.dir/src/lgc.c.obj CMakeFiles/lua.dir/src/linit.c.obj CMakeFiles/lua.dir/src/liolib.c.obj CMakeFiles/lua.dir/src/llex.c.obj CMakeFiles/lua.dir/src/lmathlib.c.obj CMakeFiles/lua.dir/src/lmem.c.obj CMakeFiles/lua.dir/src/loadlib.c.obj CMakeFiles/lua.dir/src/lobject.c.obj CMakeFiles/lua.dir/src/lopcodes.c.obj CMakeFiles/lua.dir/src/loslib.c.obj CMakeFiles/lua.dir/src/lparser.c.obj CMakeFiles/lua.dir/src/lstate.c.obj CMakeFiles/lua.dir/src/lstring.c.obj CMakeFiles/lua.dir/src/lstrlib.c.obj CMakeFiles/lua.dir/src/ltable.c.obj CMakeFiles/lua.dir/src/ltablib.c.obj CMakeFiles/lua.dir/src/ltm.c.obj CMakeFiles/lua.dir/src/lundump.c.obj CMakeFiles/lua.dir/src/lutf8lib.c.obj CMakeFiles/lua.dir/src/lvm.c.obj CMakeFiles/lua.dir/src/lzio.c.obj
   LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG
   OBJECT_DIR = CMakeFiles\lua.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
   TARGET_COMPILE_PDB = CMakeFiles\lua.dir\lua.pdb
-  TARGET_FILE = liblua.a
-  TARGET_PDB = liblua.pdb
+  TARGET_FILE = lib\liblua-5.4.a
+  TARGET_PDB = lib\liblua-5.4.pdb
 
 # =============================================================================
-# Object build statements for EXECUTABLE target lua_exe
+# Object build statements for EXECUTABLE target lua_bin
 
 
 #############################################
-# Order-only phony target for lua_exe
+# Order-only phony target for lua_bin
 
-build cmake_object_order_depends_target_lua_exe: phony || cmake_object_order_depends_target_lua
+build cmake_object_order_depends_target_lua_bin: phony || cmake_object_order_depends_target_lua
 
-build CMakeFiles/lua_exe.dir/src/lua.c.obj: C_COMPILER__lua_exe_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lua.c || cmake_object_order_depends_target_lua_exe
-  DEP_FILE = CMakeFiles\lua_exe.dir\src\lua.c.obj.d
+build CMakeFiles/lua_bin.dir/src/lua.c.obj: C_COMPILER__lua_bin_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/lua.c || cmake_object_order_depends_target_lua_bin
+  DEP_FILE = CMakeFiles\lua_bin.dir\src\lua.c.obj.d
   FLAGS = -O3 -DNDEBUG
   INCLUDES = -ID:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src
-  OBJECT_DIR = CMakeFiles\lua_exe.dir
-  OBJECT_FILE_DIR = CMakeFiles\lua_exe.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\lua_exe.dir\
-  TARGET_PDB = lua.pdb
+  OBJECT_DIR = CMakeFiles\lua_bin.dir
+  OBJECT_FILE_DIR = CMakeFiles\lua_bin.dir\src
+  TARGET_COMPILE_PDB = CMakeFiles\lua_bin.dir\
+  TARGET_PDB = bin\lua.pdb
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target lua_exe
+# Link build statements for EXECUTABLE target lua_bin
 
 
 #############################################
-# Link the executable lua.exe
+# Link the executable bin\lua.exe
 
-build lua.exe: C_EXECUTABLE_LINKER__lua_exe_Release CMakeFiles/lua_exe.dir/src/lua.c.obj | liblua.a || liblua.a
+build bin/lua.exe: C_EXECUTABLE_LINKER__lua_bin_Release CMakeFiles/lua_bin.dir/src/lua.c.obj | lib/liblua-5.4.a || lib/liblua-5.4.a
   FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = liblua.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-  OBJECT_DIR = CMakeFiles\lua_exe.dir
+  LINK_LIBRARIES = lib/liblua-5.4.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\lua_bin.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\lua_exe.dir\
-  TARGET_FILE = lua.exe
-  TARGET_IMPLIB = liblua.dll.a
-  TARGET_PDB = lua.pdb
+  TARGET_COMPILE_PDB = CMakeFiles\lua_bin.dir\
+  TARGET_FILE = bin\lua.exe
+  TARGET_IMPLIB = lib\liblua.dll.a
+  TARGET_PDB = bin\lua.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target luac_bin
+
+
+#############################################
+# Order-only phony target for luac_bin
+
+build cmake_object_order_depends_target_luac_bin: phony || cmake_object_order_depends_target_lua
+
+build CMakeFiles/luac_bin.dir/src/luac.c.obj: C_COMPILER__luac_bin_unscanned_Release D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src/luac.c || cmake_object_order_depends_target_luac_bin
+  DEP_FILE = CMakeFiles\luac_bin.dir\src\luac.c.obj.d
+  FLAGS = -O3 -DNDEBUG
+  INCLUDES = -ID:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/src
+  OBJECT_DIR = CMakeFiles\luac_bin.dir
+  OBJECT_FILE_DIR = CMakeFiles\luac_bin.dir\src
+  TARGET_COMPILE_PDB = CMakeFiles\luac_bin.dir\
+  TARGET_PDB = bin\luac.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target luac_bin
+
+
+#############################################
+# Link the executable bin\luac.exe
+
+build bin/luac.exe: C_EXECUTABLE_LINKER__luac_bin_Release CMakeFiles/luac_bin.dir/src/luac.c.obj | lib/liblua-5.4.a || lib/liblua-5.4.a
+  FLAGS = -O3 -DNDEBUG
+  LINK_LIBRARIES = lib/liblua-5.4.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\luac_bin.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = CMakeFiles\luac_bin.dir\
+  TARGET_FILE = bin\luac.exe
+  TARGET_IMPLIB = lib\libluac.dll.a
+  TARGET_PDB = bin\luac.pdb
 
 
 #############################################
@@ -511,9 +528,17 @@ build install/strip: phony CMakeFiles/install/strip.util
 # =============================================================================
 # Target aliases.
 
-build lua: phony liblua.a
+build liblua-5.4.a: phony lib/liblua-5.4.a
 
-build lua_exe: phony lua.exe
+build lua: phony lib/liblua-5.4.a
+
+build lua.exe: phony bin/lua.exe
+
+build lua_bin: phony bin/lua.exe
+
+build luac.exe: phony bin/luac.exe
+
+build luac_bin: phony bin/luac.exe
 
 # =============================================================================
 # Folder targets.
@@ -523,7 +548,7 @@ build lua_exe: phony lua.exe
 #############################################
 # Folder: D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang
 
-build all: phony liblua.a lua.exe
+build all: phony lib/liblua-5.4.a bin/lua.exe bin/luac.exe
 
 # =============================================================================
 # Built-in targets
@@ -546,14 +571,14 @@ build D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang/CMakeFi
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang/CMakeFiles/cmake.verify_globs | C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCommonLanguageInclude.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCompilerIdDetection.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompileFeatures.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeFindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeGenericSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeInitializeConfigs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeLanguageInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeNinjaFindMake.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseLibraryArchitecture.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystem.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInitialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCompilerCommon.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CrayClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/LCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OrangeC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TIClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Tasking-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/GNUInstallDirs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/CMakeDetermineLinkerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/FeatureTesting.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Initialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-windres.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/3.29.2/CMakeCCompiler.cmake CMakeFiles/3.29.2/CMakeRCCompiler.cmake CMakeFiles/3.29.2/CMakeSystem.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang/CMakeFiles/VerifyGlobs.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/CMakeLists.txt
+build build.ninja: RERUN_CMAKE D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang/CMakeFiles/cmake.verify_globs | C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeASMCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeASMInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCommonLanguageInclude.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCompilerIdDetection.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineASMCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompileFeatures.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeFindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeGenericSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeInitializeConfigs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeLanguageInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeNinjaFindMake.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseLibraryArchitecture.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystem.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInitialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestASMCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCompilerCommon.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-ASM.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CrayClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/LCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OrangeC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TIClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Tasking-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/GNUInstallDirs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/CMakeDetermineLinkerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/FeatureTesting.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang-ASM.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Initialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-windres.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/3.29.2/CMakeASMCompiler.cmake CMakeFiles/3.29.2/CMakeCCompiler.cmake CMakeFiles/3.29.2/CMakeRCCompiler.cmake CMakeFiles/3.29.2/CMakeSystem.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang/CMakeFiles/VerifyGlobs.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/CMakeLists.txt
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCommonLanguageInclude.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCompilerIdDetection.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompileFeatures.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeFindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeGenericSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeInitializeConfigs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeLanguageInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeNinjaFindMake.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseLibraryArchitecture.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystem.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInitialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCompilerCommon.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CrayClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/LCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OrangeC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TIClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Tasking-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/GNUInstallDirs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/CMakeDetermineLinkerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/FeatureTesting.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Initialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-windres.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/3.29.2/CMakeCCompiler.cmake CMakeFiles/3.29.2/CMakeRCCompiler.cmake CMakeFiles/3.29.2/CMakeSystem.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang/CMakeFiles/VerifyGlobs.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/CMakeLists.txt: phony
+build C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeASMCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeASMInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCCompilerABI.c C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCommonLanguageInclude.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeCompilerIdDetection.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineASMCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompileFeatures.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineCompilerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeDetermineSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeFindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeGenericSystem.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeInitializeConfigs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeLanguageInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeNinjaFindMake.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeParseLibraryArchitecture.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCCompiler.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeRCInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystem.cmake.in C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInformation.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeSystemSpecificInitialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestASMCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestCompilerCommon.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/CMakeTestRCCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-ASM.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/CrayClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/LCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/OrangeC-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TI-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TIClang-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Tasking-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/GNUInstallDirs.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/CMakeDetermineLinkerId.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Internal/FeatureTesting.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang-ASM.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang-C.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Clang.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-GNU.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-Initialize.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows-windres.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/Windows.cmake C$:/Strawberry/c/share/cmake-3.29/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/3.29.2/CMakeASMCompiler.cmake CMakeFiles/3.29.2/CMakeCCompiler.cmake CMakeFiles/3.29.2/CMakeRCCompiler.cmake CMakeFiles/3.29.2/CMakeSystem.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/build-clang/CMakeFiles/VerifyGlobs.cmake D$:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.4.8/CMakeLists.txt: phony
 
 
 #############################################

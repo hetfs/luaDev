@@ -37,17 +37,14 @@ $ScriptRoot = $PSScriptRoot
 $SCRIPT_VERSION = "2.2.0"
 $startTime = Get-Date
 
-# Create logs directory first
 $logDir = Join-Path $ScriptRoot "logs"
 if (-not (Test-Path $logDir)) {
     New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 }
 
-# Create timestamped log file
 $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $logFile = Join-Path $logDir "build-$timestamp.log"
 
-# Basic log function until modules load
 function Write-Log {
     param($Message, $Color = "White")
     $stamp = "[$(Get-Date -Format u)]"
@@ -64,16 +61,13 @@ $ModulesPath = Join-Path $ScriptRoot "modules"
 try {
     Write-Log "🔍 Loading modules from $ModulesPath" -Color DarkCyan
 
-    # Import module loader
     $loaderPath = Join-Path $ModulesPath "loader.psm1"
     if (Test-Path $loaderPath) {
         Import-Module $loaderPath -Force -DisableNameChecking
         Write-Log "✅ Module loader imported" -Color Green
 
-        # Load all modules with diagnostics
         Import-LuaDevModules -ModulesPath $ModulesPath -AllowFallback
 
-        # Verify critical modules by function availability
         $criticalFunctions = @{
             "globals" = "Get-ProjectRoot"
             "logging" = "Initialize-Logging"
@@ -96,7 +90,6 @@ try {
         throw "Module loader not found at $loaderPath"
     }
 
-    # Initialize logging subsystem
     Initialize-Logging -FilePath $logFile
     Set-LogLevel -Level $LogLevel
     Write-InfoLog "Logging subsystem initialized (Level: $LogLevel)"
@@ -105,7 +98,6 @@ catch {
     $errMsg = "Module system failed: $($_.Exception.Message)"
     Write-Log $errMsg -Color Red
 
-    # Show available modules for debugging
     if (Test-Path $ModulesPath) {
         $moduleFiles = Get-ChildItem $ModulesPath -Filter *.psm1 |
                        Select-Object -ExpandProperty Name
@@ -124,7 +116,7 @@ catch {
 #region Clean Operation
 if ($Clean) {
     try {
-        Write-InfoLog "🚮 Initializing clean operation..."
+        Write-InfoLog "🚽 Initializing clean operation..."
         $pathsToClean = @(
             (Join-Path (Get-ProjectRoot) "luaBinary"),
             (Join-Path (Get-ProjectRoot) "logs")
@@ -154,11 +146,9 @@ try {
     Write-InfoLog "  - Compiler: $Compiler"
     Write-InfoLog "  - Dry Run: $($DryRun.IsPresent)"
 
-    # Get platform info
     $osInfo = Get-OSPlatform
     Write-InfoLog "🌐 Platform: $($osInfo.Platform) ($($osInfo.Architecture))"
 
-    # Resolve target versions
     $BuildTargets = [System.Collections.Generic.List[hashtable]]::new()
     foreach ($engine in ($Engines | Select-Object -Unique)) {
         $versions = if ($EngineVersions) {
@@ -184,7 +174,6 @@ try {
         }
     }
 
-    # Validate targets
     if ($BuildTargets.Count -eq 0) {
         throw "No valid build targets found"
     }
@@ -209,7 +198,6 @@ try {
         $engine = $target.Engine
         $version = $target.Version
 
-        # Create build metadata
         $buildMeta = @{
             Engine = $engine
             Version = $version
@@ -227,7 +215,6 @@ try {
                 $buildMeta.Success = $true
             }
             else {
-                # Get source path (download if needed)
                 $sourcePath = Get-SourcePath -Engine $engine -Version $version
                 if (-not (Test-Path $sourcePath)) {
                     Write-InfoLog "📦 Source not found - fetching: $engine $version"
@@ -237,7 +224,6 @@ try {
                     }
                 }
 
-                # Generate build files
                 if ($engine -eq "lua") {
                     $buildMeta.Success = Build-LuaEngine -Version $version -SourcePath $sourcePath -BuildType $BuildType -Compiler $Compiler
                 }
@@ -265,17 +251,18 @@ catch {
 
 #region Post-Build Processing
 try {
-    # Generate reports
     Write-InfoLog "📊 Generating build reports"
     $manifestPath = Export-LuaBuildManifest -Artifacts $Artifacts
-    $markdownPath = Export-LogAsMarkdown -LogPath $logFile -Title "Build Report - $timestamp"
+    $logLines = Get-Content -Path $logFile -Encoding UTF8
+    $markdownPath = Join-Path (Get-ProjectRoot) "manifests/manifest.md"
 
-    # Export to documentation system
+    Export-LogAsMarkdown -Path $markdownPath -LogLines $logLines -Title "Build Report - $timestamp" -DryRun:$DryRun
+    Export-BuildManifestsToDocs -DryRun:$DryRun
+
     if (-not $DryRun) {
         Export-BuildLogsToDocs -Artifacts $Artifacts
     }
 
-    # Build summary
     $successCount = ($Artifacts | Where-Object { $_.Success }).Count
     $totalDuration = [Math]::Round(((Get-Date) - $startTime).TotalMinutes, 2)
 
@@ -292,13 +279,9 @@ try {
 catch {
     Write-WarningLog "⚠️ Post-build processing failed: $($_.Exception.Message)"
 }
+#endregion
 
 Write-InfoLog "=== BUILD COMPLETE ==="
 
-# Calculate exit code
 $failedCount = ($Artifacts | Where-Object { -not $_.Success }).Count
-if ($failedCount -eq 0) {
-    exit 0
-} else {
-    exit 1
-}
+exit ($failedCount -eq 0) ? 0 : 1
