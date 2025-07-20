@@ -1,4 +1,4 @@
-# luajitBuilder.psm1
+# luajitBuilder.psm1 - Revised
 
 function Build-LuaJIT {
     [CmdletBinding()]
@@ -33,8 +33,12 @@ function Build-LuaJIT {
         }
         New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 
-        # 3. Configure CMake arguments
-        $cmakeArgs = @("-DCMAKE_BUILD_TYPE=Release")
+        # 3. Configure CMake arguments - ADDED CMAKE POSITION_INDEPENDENT_CODE
+        $cmakeArgs = @(
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+        )
+
         switch ($Compiler) {
             "clang" {
                 $cmakeArgs += "-DCMAKE_C_COMPILER=clang"
@@ -49,7 +53,7 @@ function Build-LuaJIT {
             }
         }
 
-        # 4. Configure and build
+        # 4. Configure and build - ADDED VERBOSE BUILD OUTPUT
         Push-Location $buildDir
         try {
             Write-InfoLog "🛠️ Configuring CMake for LuaJIT $Version ($Compiler)"
@@ -59,7 +63,8 @@ function Build-LuaJIT {
             }
 
             Write-InfoLog "🏗️ Building LuaJIT $Version with $Compiler ($BuildType)..."
-            & cmake --build . --config Release --parallel
+            # ADDED VERBOSE FLAG TO CAPTURE BUILD ERRORS
+            & cmake --build . --config Release --parallel --verbose
             if ($LASTEXITCODE -ne 0) {
                 throw "Build failed (exit $LASTEXITCODE)"
             }
@@ -72,16 +77,19 @@ function Build-LuaJIT {
                 New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null
             }
 
-            # 6. Copy artifacts
-            $binDir = if (Test-Path "$buildDir/bin") { "$buildDir/bin" } else { $buildDir }
-            $libDir = if (Test-Path "$buildDir/lib") { "$buildDir/lib" } else { $buildDir }
+            # 6. Copy artifacts - IMPROVED FILE DISCOVERY
+            $copyOperations = @(
+                @{ Pattern = "luajit*"; Types = @(".exe", "") }
+                @{ Pattern = "libluajit*"; Types = @(".a", ".lib", ".dll", ".so", ".dylib") }
+                @{ Pattern = "lua51*"; Types = @(".dll") }  # LuaJIT 2.1 specific
+            )
 
-            $patterns = @("luajit*", "*.a", "*.lib", "*.dll", "*.so", "*.dylib")
             $copied = 0
-            foreach ($pattern in $patterns) {
-                $files = Get-ChildItem -Path $binDir, $libDir -Recurse -Include $pattern -ErrorAction SilentlyContinue
+            foreach ($op in $copyOperations) {
+                $files = Get-ChildItem -Path $buildDir -Recurse -Include $op.Pattern -ErrorAction SilentlyContinue |
+                         Where-Object { $op.Types -contains $_.Extension -or $_.Extension -eq "" }
+
                 foreach ($file in $files) {
-                    if ($file.PSIsContainer -or $file.Extension -eq ".h") { continue }
                     $dest = Join-Path $artifactDir $file.Name
                     Copy-Item -Path $file.FullName -Destination $dest -Force
                     Write-VerboseLog "📦 Copied: $($file.Name)"
@@ -93,8 +101,9 @@ function Build-LuaJIT {
                 throw "No binaries copied from build output"
             }
 
-            # 7. Copy headers
-            $headers = Get-ChildItem -Path $SourcePath -Recurse -Include "*.h"
+            # 7. Copy headers - FIXED PATH FOR LUAROCKS
+            $headerPath = if (Test-Path "$SourcePath/src") { "$SourcePath/src" } else { $SourcePath }
+            $headers = Get-ChildItem -Path $headerPath -Recurse -Include "*.h" -ErrorAction SilentlyContinue
             foreach ($h in $headers) {
                 $dest = Join-Path $artifactDir $h.Name
                 Copy-Item -Path $h.FullName -Destination $dest -Force

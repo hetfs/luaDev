@@ -1,21 +1,88 @@
 {
-  "Artifacts": {
-    "Engine": "luajit",
-    "Version": "2.1.0-beta3",
-    "BuildType": "static",
-    "Compiler": "clang",
-    "Success": [
-      "-- Building for: Ninja",
-      "-- Configuring incomplete, errors occurred!",
-      false
-    ],
-    "Architecture": "x64",
-    "Path": "binaries/luajit-2.1.0-beta3-static-clang-x64"
-  },
-  "Timestamp": "2025-07-10T03:23:16Z",
+  "Artifacts": [
+    {
+      "Engine": "lua",
+      "Version": "5.4.8",
+      "BuildType": "static",
+      "Compiler": "msvc",
+      "Success": [
+        "-- Building for: Ninja",
+        "-- Configuring incomplete, errors occurred!",
+        false
+      ],
+      "Architecture": "x64",
+      "Path": "binaries/lua-5.4.8-static-msvc-x64"
+    },
+    {
+      "Engine": "lua",
+      "Version": "5.3.6",
+      "BuildType": "static",
+      "Compiler": "msvc",
+      "Success": [
+        "-- Building for: Ninja",
+        "-- Configuring incomplete, errors occurred!",
+        false
+      ],
+      "Architecture": "x64",
+      "Path": "binaries/lua-5.3.6-static-msvc-x64"
+    },
+    {
+      "Engine": "lua",
+      "Version": "5.2.4",
+      "BuildType": "static",
+      "Compiler": "msvc",
+      "Success": [
+        "-- Building for: Ninja",
+        "-- Configuring incomplete, errors occurred!",
+        false
+      ],
+      "Architecture": "x64",
+      "Path": "binaries/lua-5.2.4-static-msvc-x64"
+    },
+    {
+      "Engine": "lua",
+      "Version": "5.1.5",
+      "BuildType": "static",
+      "Compiler": "msvc",
+      "Success": [
+        "-- Building for: Ninja",
+        "-- Configuring incomplete, errors occurred!",
+        false
+      ],
+      "Architecture": "x64",
+      "Path": "binaries/lua-5.1.5-static-msvc-x64"
+    },
+    {
+      "Engine": "luajit",
+      "Version": "2.1.0-beta3",
+      "BuildType": "static",
+      "Compiler": "msvc",
+      "Success": [
+        "-- Building for: Ninja",
+        "-- Configuring incomplete, errors occurred!",
+        false
+      ],
+      "Architecture": "x64",
+      "Path": "binaries/luajit-2.1.0-beta3-static-msvc-x64"
+    },
+    {
+      "Engine": "luajit",
+      "Version": "2.0.5",
+      "BuildType": "static",
+      "Compiler": "msvc",
+      "Success": [
+        "-- Building for: Ninja",
+        "-- Configuring incomplete, errors occurred!",
+        false
+      ],
+      "Architecture": "x64",
+      "Path": "binaries/luajit-2.0.5-static-msvc-x64"
+    }
+  ],
+  "Timestamp": "2025-07-15T15:12:34Z",
   "System": {
+    "Platform": "windows",
     "Architecture": "x64",
-    "Cores": 12,
-    "Platform": "windows"
+    "Cores": 12
   }
 }

@@ -1,0 +1,9 @@
+{
+  "label": "Troubleshooting",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "title": "LuaDev Troubleshooting",
+    "description": "Solutions to common build issues, linker errors, version mismatches, and environment setup problems in luaDev."
+  }
+}

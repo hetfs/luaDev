@@ -17,23 +17,98 @@ max_line_length = 140
 ########################################################
 # 📄 Markdown — Allow trailing spaces and long lines
 ########################################################
-[*.md]
+[*.{md,markdown}]
 trim_trailing_whitespace = false
-max_line_length = off  # 'unset' is deprecated in some editors
+max_line_length = off
 
 ########################################################
-# ⚙️ JSON, YAML, and Configs — Common Overrides
+# ⚙️ JSON, YAML, TOML, INI — Config Files
 ########################################################
-[*.json]
+[*.{json,jsonc}]  # Includes JSON with Comments
 indent_size = 2
 max_line_length = 120
 
-[*.yml]
+[*.{yml,yaml}]
 indent_size = 2
-ij_yaml_spaces_within_brackets = false
+ij_yaml_spaces_within_brackets = false  # JetBrains IDEs only
 
-[*.yaml]
+[*.toml]
 indent_size = 2
+max_line_length = 120
+
+[*.ini]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = false
+
+########################################################
+# 🏗️ CMake Build Files
+########################################################
+[CMakeLists.txt, *.cmake]
+indent_size = 2
+
+########################################################
+# 🖥 C/C++ Files — System Programming
+########################################################
+[*.{c,cpp,h,hpp,cc,hh,inc}]
+indent_size = 4
+max_line_length = 120
+ij_cpp_align_parameters_in_declarations = false
+
+########################################################
+# 🦀 Rust — Official Style Guide
+########################################################
+[*.rs]
+indent_style = space
+indent_size = 4
+max_line_length = 100  # rustfmt default
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+########################################################
+# 🐹 Go (Golang) — Official Conventions
+########################################################
+[*.go]
+indent_style = tab          # Go requires tabs, not spaces
+tab_width = 8               # Official specification
+max_line_length = 100       # Common practice (gofmt uses 80 but allows longer)
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+########################################################
+# 🐍 Python — PEP-8 Compliance
+########################################################
+[*.py]
+indent_size = 4
+max_line_length = 120
+
+########################################################
+# ☕ Java — Industry Standards
+########################################################
+[*.java]
+indent_size = 4
+ij_java_blank_lines_after_imports = 1
+
+########################################################
+# 🔷 C# — Microsoft Conventions
+########################################################
+[*.cs]
+indent_size = 4
+dotnet_sort_system_directives_first = true
+
+########################################################
+# 🌐 HTML/CSS — Web Development
+########################################################
+[*.{html,htm,css,scss}]
+indent_size = 2
+max_line_length = 120
+
+########################################################
+# 📜 JavaScript/TypeScript — Common Conventions
+########################################################
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+max_line_length = 120
 
 ########################################################
 # 💡 Lua Files
@@ -44,10 +119,7 @@ indent_size = 4
 ########################################################
 # 🛠 PowerShell Files
 ########################################################
-[*.ps1]
-indent_size = 4
-
-[*.psm1]
+[*.{ps1,psd1,psm1}]
 indent_size = 4
 
 ########################################################
@@ -55,6 +127,18 @@ indent_size = 4
 ########################################################
 [*.sh]
 indent_size = 4
+
+########################################################
+# 📝 Git Commit Messages
+########################################################
+[COMMIT_EDITMSG]
+max_line_length = 72
+
+########################################################
+# 🧩 Makefiles (require tabs)
+########################################################
+[Makefile]
+indent_style = tab
 
 ########################################################
 # 📁 Specific File Overrides

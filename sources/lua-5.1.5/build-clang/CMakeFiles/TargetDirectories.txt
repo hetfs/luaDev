@@ -1,9 +1,0 @@
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/lua.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/lua_bin.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/luac_bin.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/edit_cache.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/rebuild_cache.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/list_install_components.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/install.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/install/local.dir
-D:/HETFS-LTD/GitHub-Projects/luaDev/sources/lua-5.1.5/build-clang/CMakeFiles/install/strip.dir
